@@ -163,12 +163,7 @@ const AdaptiveFeedback = ({
           {/* Difficulty Change Message */}
           {getDifficultyMessage() && (
             <div className="bg-secondary/5 border border-secondary/20 rounded-lg p-3 mb-4">
-              <div className="flex items-center space-x-2 mb-1">
-                <Icon name="TrendingUp" size={16} className="text-secondary" />
-                <span className="text-sm font-medium text-secondary">
-                  Adaptive Learning
-                </span>
-              </div>
+
               <p className="text-xs text-muted-foreground">
                 {getDifficultyMessage()}
               </p>

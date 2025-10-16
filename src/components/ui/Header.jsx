@@ -50,13 +50,8 @@ const Header = ({ className = "" }) => {
 
   const Logo = () => (
     <div className="flex items-center space-x-3">
-      <div className="relative">
-        <div className="w-10 h-10 rounded-lg bg-gradient-to-br from-primary to-secondary flex items-center justify-center neon-glow">
-          <Icon name="Zap" size={24} className="text-white" />
-        </div>
-      </div>
       <div className="flex flex-col">
-        <span className="text-xl font-bold text-gradient">AdaptiveLearn</span>
+        <span className="text-xl font-bold text-foreground">Nayi Disha</span>
         <span className="text-xs text-muted-foreground">
           AI-Powered Learning
         </span>
@@ -66,7 +61,7 @@ const Header = ({ className = "" }) => {
 
   return (
     <header
-      className={`fixed top-0 left-0 right-0 z-50 glass-card border-b border-purple-500/20 ${className}`}
+      className={`fixed top-0 left-0 right-0 z-50 bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60 border-b ${className}`}
     >
       <div className="px-6 py-4">
         <div className="flex items-center justify-between">
@@ -90,11 +85,10 @@ const Header = ({ className = "" }) => {
                 iconPosition="left"
                 iconSize={18}
                 className={`
-                  px-4 py-2 transition-all duration-200
                   ${
                     isActive(item?.path)
-                      ? "bg-primary/20 text-primary border border-primary/30 neon-glow"
-                      : "hover:bg-white/5 hover:text-primary"
+                      ? "bg-primary text-primary-foreground"
+                      : ""
                   }
                 `}
               >
@@ -111,13 +105,12 @@ const Header = ({ className = "" }) => {
                 size="sm"
                 onClick={() => setIsMenuOpen(!isMenuOpen)}
                 iconName="MoreHorizontal"
-                className="hover:bg-white/5"
               >
                 More
               </Button>
 
               {isMenuOpen && (
-                <div className="absolute right-0 top-full mt-2 w-48 glass-card border border-purple-500/20 rounded-lg shadow-glass-lg animate-fade-in">
+                <div className="absolute right-0 top-full mt-2 w-48 bg-popover border rounded-lg shadow-md">
                   <div className="p-2">
                     {secondaryItems?.map((item) => (
                       <Button
@@ -128,7 +121,7 @@ const Header = ({ className = "" }) => {
                         iconName={item?.icon}
                         iconPosition="left"
                         iconSize={16}
-                        className="w-full justify-start hover:bg-white/5 text-sm"
+                        className="w-full justify-start text-sm"
                       >
                         {item?.label}
                       </Button>
@@ -139,7 +132,7 @@ const Header = ({ className = "" }) => {
             </div>
 
             {/* User Avatar */}
-            <div className="w-8 h-8 rounded-full bg-gradient-to-br from-primary to-secondary flex items-center justify-center cursor-pointer hover:scale-110 transition-transform">
+            <div className="w-8 h-8 rounded-full bg-primary flex items-center justify-center cursor-pointer hover:opacity-80 transition-opacity">
               <Icon name="User" size={16} className="text-white" />
             </div>
           </div>
@@ -150,13 +143,13 @@ const Header = ({ className = "" }) => {
             size="sm"
             onClick={() => setIsMenuOpen(!isMenuOpen)}
             iconName={isMenuOpen ? "X" : "Menu"}
-            className="lg:hidden hover:bg-white/5"
+            className="lg:hidden"
           />
         </div>
 
         {/* Mobile Navigation */}
         {isMenuOpen && (
-          <div className="lg:hidden mt-4 pt-4 border-t border-purple-500/20 animate-slide-up">
+          <div className="lg:hidden mt-4 pt-4 border-t">
             <nav className="space-y-2">
               {navigationItems?.map((item) => (
                 <Button
@@ -171,8 +164,8 @@ const Header = ({ className = "" }) => {
                     w-full justify-start px-4 py-3
                     ${
                       isActive(item?.path)
-                        ? "bg-primary/20 text-primary border border-primary/30"
-                        : "hover:bg-white/5"
+                        ? "bg-primary text-primary-foreground"
+                        : ""
                     }
                   `}
                 >
@@ -185,7 +178,7 @@ const Header = ({ className = "" }) => {
                 </Button>
               ))}
 
-              <div className="pt-2 mt-4 border-t border-purple-500/20">
+              <div className="pt-2 mt-4 border-t">
                 {secondaryItems?.map((item) => (
                   <Button
                     key={item?.path}
@@ -195,7 +188,7 @@ const Header = ({ className = "" }) => {
                     iconName={item?.icon}
                     iconPosition="left"
                     iconSize={16}
-                    className="w-full justify-start hover:bg-white/5"
+                    className="w-full justify-start"
                   >
                     {item?.label}
                   </Button>

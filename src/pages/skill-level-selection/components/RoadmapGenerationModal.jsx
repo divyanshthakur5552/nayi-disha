@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from "react";
 import Icon from "../../../components/AppIcon";
 import Button from "../../../components/ui/Button";
+import { generateRoadmap } from "../../../services/api";
 
 const RoadmapGenerationModal = ({
   isOpen,
@@ -11,6 +12,8 @@ const RoadmapGenerationModal = ({
   const [currentStep, setCurrentStep] = useState(0);
   const [progress, setProgress] = useState(0);
   const [isGenerating, setIsGenerating] = useState(false);
+  const [error, setError] = useState(null);
+  const [generatedRoadmap, setGeneratedRoadmap] = useState(null);
 
   const generationSteps = [
     {
@@ -64,32 +67,63 @@ const RoadmapGenerationModal = ({
     let elapsed = 0;
 
     const processSteps = async () => {
-      for (let i = 0; i < generationSteps?.length; i++) {
-        setCurrentStep(i);
+      try {
+        setError(null);
+        
+        // Start visual progress animation
+        for (let i = 0; i < 2; i++) {
+          setCurrentStep(i);
+          const stepDuration = generationSteps?.[i]?.duration;
+          
+          const progressInterval = setInterval(() => {
+            elapsed += 50;
+            const newProgress = Math.min((elapsed / totalDuration) * 100, 40);
+            setProgress(newProgress);
+          }, 50);
+          
+          await new Promise((resolve) => setTimeout(resolve, stepDuration));
+          clearInterval(progressInterval);
+        }
 
-        const stepDuration = generationSteps?.[i]?.duration;
-        const stepProgress = (elapsed / totalDuration) * 100;
-
-        // Animate progress for current step
-        const progressInterval = setInterval(() => {
-          elapsed += 50;
-          const newProgress = Math.min((elapsed / totalDuration) * 100, 100);
-          setProgress(newProgress);
-
-          if (elapsed >= (i + 1) * stepDuration) {
-            clearInterval(progressInterval);
-          }
-        }, 50);
-
-        await new Promise((resolve) => setTimeout(resolve, stepDuration));
-      }
-
-      // Complete generation
-      setProgress(100);
-      setTimeout(() => {
+        // Make actual API call during "Consulting AI Engine" step
+        setCurrentStep(1);
+        setProgress(45);
+        
+        const roadmapData = await generateRoadmap(
+          userSelections?.subject || "JavaScript",
+          userSelections?.goal || "Full Stack Development",
+          userSelections?.skillLevel || "intermediate"
+        );
+        
+        setGeneratedRoadmap(roadmapData);
+        setProgress(70);
+        
+        // Continue with remaining visual steps
+        for (let i = 2; i < generationSteps?.length; i++) {
+          setCurrentStep(i);
+          const stepDuration = 1000; // Faster since API is done
+          
+          const progressInterval = setInterval(() => {
+            setProgress((prev) => Math.min(prev + 5, 95));
+          }, 100);
+          
+          await new Promise((resolve) => setTimeout(resolve, stepDuration));
+          clearInterval(progressInterval);
+        }
+        
+        // Complete
+        setProgress(100);
+        setTimeout(() => {
+          setIsGenerating(false);
+          onComplete(roadmapData);
+        }, 500);
+        
+      } catch (err) {
+        console.error("Roadmap generation error:", err);
+        setError(err.message || "Failed to generate roadmap. Please try again.");
         setIsGenerating(false);
-        onComplete();
-      }, 500);
+        setProgress(0);
+      }
     };
 
     processSteps();
@@ -229,24 +263,54 @@ const RoadmapGenerationModal = ({
             </div>
           </div>
 
-          {/* Loading Message */}
+          {/* Loading Message or Error */}
           <div className="text-center">
-            <p className="text-sm text-muted-foreground mb-4">
-              {isGenerating
-                ? "This usually takes 10-15 seconds. Please don't close this window."
-                : "Your personalized roadmap is ready!"}
-            </p>
+            {error ? (
+              <>
+                <div className="mb-4 p-4 bg-destructive/10 border border-destructive/20 rounded-lg">
+                  <Icon name="AlertCircle" size={24} className="text-destructive mx-auto mb-2" />
+                  <p className="text-sm text-destructive font-medium mb-1">Generation Failed</p>
+                  <p className="text-xs text-muted-foreground">{error}</p>
+                </div>
+                <div className="flex gap-2 justify-center">
+                  <Button
+                    variant="outline"
+                    onClick={onClose}
+                    iconName="X"
+                    iconPosition="left"
+                  >
+                    Close
+                  </Button>
+                  <Button
+                    variant="default"
+                    onClick={() => window.location.reload()}
+                    iconName="RefreshCw"
+                    iconPosition="left"
+                  >
+                    Try Again
+                  </Button>
+                </div>
+              </>
+            ) : (
+              <>
+                <p className="text-sm text-muted-foreground mb-4">
+                  {isGenerating
+                    ? "This usually takes 10-15 seconds. Please don't close this window."
+                    : "Your personalized roadmap is ready!"}
+                </p>
 
-            {!isGenerating && (
-              <Button
-                variant="default"
-                onClick={onComplete}
-                iconName="ArrowRight"
-                iconPosition="right"
-                className="neon-glow"
-              >
-                View My Roadmap
-              </Button>
+                {!isGenerating && (
+                  <Button
+                    variant="default"
+                    onClick={() => onComplete(generatedRoadmap)}
+                    iconName="ArrowRight"
+                    iconPosition="right"
+                    className="neon-glow"
+                  >
+                    View My Roadmap
+                  </Button>
+                )}
+              </>
             )}
           </div>
         </div>

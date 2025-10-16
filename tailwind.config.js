@@ -18,78 +18,50 @@ module.exports = {
     },
     extend: {
       colors: {
-        border: "var(--color-border)" /* slate-600 */,
-        input: "var(--color-input)" /* custom-surface */,
-        ring: "var(--color-ring)" /* violet-500 */,
-        background: "var(--color-background)" /* deep-navy */,
-        foreground: "var(--color-foreground)" /* slate-50 */,
+        border: "var(--color-border)",
+        input: "var(--color-input)",
+        ring: "var(--color-ring)",
+        background: "var(--color-background)",
+        foreground: "var(--color-foreground)",
         primary: {
-          DEFAULT: "var(--color-primary)" /* violet-500 */,
-          foreground: "var(--color-primary-foreground)" /* white */,
+          DEFAULT: "var(--color-primary)",
+          foreground: "var(--color-primary-foreground)",
         },
         secondary: {
-          DEFAULT: "var(--color-secondary)" /* cyan-500 */,
-          foreground: "var(--color-secondary-foreground)" /* white */,
+          DEFAULT: "var(--color-secondary)",
+          foreground: "var(--color-secondary-foreground)",
         },
         destructive: {
-          DEFAULT: "var(--color-destructive)" /* red-500 */,
-          foreground: "var(--color-destructive-foreground)" /* white */,
+          DEFAULT: "var(--color-destructive)",
+          foreground: "var(--color-destructive-foreground)",
         },
         muted: {
-          DEFAULT: "var(--color-muted)" /* slate-600 */,
-          foreground: "var(--color-muted-foreground)" /* slate-400 */,
+          DEFAULT: "var(--color-muted)",
+          foreground: "var(--color-muted-foreground)",
         },
         accent: {
-          DEFAULT: "var(--color-accent)" /* emerald-500 */,
-          foreground: "var(--color-accent-foreground)" /* white */,
+          DEFAULT: "var(--color-accent)",
+          foreground: "var(--color-accent-foreground)",
         },
         popover: {
-          DEFAULT: "var(--color-popover)" /* custom-surface */,
-          foreground: "var(--color-popover-foreground)" /* slate-50 */,
+          DEFAULT: "var(--color-popover)",
+          foreground: "var(--color-popover-foreground)",
         },
         card: {
-          DEFAULT: "var(--color-card)" /* custom-surface */,
-          foreground: "var(--color-card-foreground)" /* slate-50 */,
+          DEFAULT: "var(--color-card)",
+          foreground: "var(--color-card-foreground)",
         },
         success: {
-          DEFAULT: "var(--color-success)" /* green-500 */,
-          foreground: "var(--color-success-foreground)" /* white */,
+          DEFAULT: "var(--color-success)",
+          foreground: "var(--color-success-foreground)",
         },
         warning: {
-          DEFAULT: "var(--color-warning)" /* amber-500 */,
-          foreground: "var(--color-warning-foreground)" /* black */,
+          DEFAULT: "var(--color-warning)",
+          foreground: "var(--color-warning-foreground)",
         },
         error: {
-          DEFAULT: "var(--color-error)" /* red-500 */,
-          foreground: "var(--color-error-foreground)" /* white */,
-        },
-        // Brand Colors (Direct hex values for consistency)
-        violet: {
-          400: "#A78BFA" /* violet-400 */,
-          500: "#8B5CF6" /* violet-500 */,
-          600: "#7C3AED" /* violet-600 */,
-          900: "#4C1D95" /* violet-900 */,
-        },
-        cyan: {
-          400: "#22D3EE" /* cyan-400 */,
-          500: "#06B6D4" /* cyan-500 */,
-          600: "#0891B2" /* cyan-600 */,
-        },
-        emerald: {
-          400: "#34D399" /* emerald-400 */,
-          500: "#10B981" /* emerald-500 */,
-          600: "#059669" /* emerald-600 */,
-        },
-        slate: {
-          400: "#94A3B8" /* slate-400 */,
-          600: "#475569" /* slate-600 */,
-          700: "#334155" /* slate-700 */,
-          800: "#1E293B" /* slate-800 */,
-          900: "#0F172A" /* slate-900 */,
-        },
-        purple: {
-          500: "#8B5CF6" /* purple-500 */,
-          900: "#581C87" /* purple-900 */,
+          DEFAULT: "var(--color-error)",
+          foreground: "var(--color-error-foreground)",
         },
       },
       borderRadius: {
@@ -165,18 +137,6 @@ module.exports = {
             transform: "scale(1)",
           },
         },
-      },
-      boxShadow: {
-        glass: "0 8px 32px 0 rgba(139, 92, 246, 0.15)",
-        "glass-lg": "0 25px 50px -12px rgba(139, 92, 246, 0.25)",
-        neon: "0 0 20px rgba(139, 92, 246, 0.3), 0 0 40px rgba(139, 92, 246, 0.1)",
-      },
-      backgroundImage: {
-        "gradient-radial": "radial-gradient(var(--tw-gradient-stops))",
-        "gradient-conic":
-          "conic-gradient(from 180deg at 50% 50%, var(--tw-gradient-stops))",
-        "glass-gradient":
-          "linear-gradient(135deg, rgba(255, 255, 255, 0.1) 0%, rgba(255, 255, 255, 0.05) 100%)",
       },
     },
   },

@@ -48,9 +48,7 @@ const RoadmapHeader = ({
       <div className="flex flex-col lg:flex-row lg:items-start lg:justify-between mb-6">
         <div className="flex-1 mb-6 lg:mb-0">
           <div className="flex items-center space-x-3 mb-3">
-            <div className="w-12 h-12 rounded-lg bg-gradient-to-br from-primary to-secondary flex items-center justify-center neon-glow">
-              <Icon name="Zap" size={24} className="text-white" />
-            </div>
+
             <div>
               <h1 className="text-2xl lg:text-3xl font-bold text-gradient">
                 {data?.title}

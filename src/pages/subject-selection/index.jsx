@@ -105,7 +105,7 @@ const SubjectSelection = () => {
   // Load saved selection from localStorage
   useEffect(() => {
     const savedSelection = localStorage.getItem(
-      "adaptivelearn_selected_technology"
+      "Nayi Disha_selected_technology"
     );
     if (savedSelection) {
       try {
@@ -124,7 +124,7 @@ const SubjectSelection = () => {
   const handleTechnologySelect = (technology) => {
     setSelectedTechnology(technology);
     localStorage.setItem(
-      "adaptivelearn_selected_technology",
+      "Nayi Disha_selected_technology",
       JSON.stringify(technology)
     );
   };
@@ -132,7 +132,7 @@ const SubjectSelection = () => {
   // Reset selection
   const handleReset = () => {
     setSelectedTechnology(null);
-    localStorage.removeItem("adaptivelearn_selected_technology");
+    localStorage.removeItem("Nayi Disha_selected_technology");
   };
 
   // Continue to next step

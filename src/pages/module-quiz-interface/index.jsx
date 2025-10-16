@@ -10,6 +10,7 @@ import AdaptiveFeedback from "./components/AdaptiveFeedback";
 import QuizSidebar from "./components/QuizSidebar";
 import Button from "../../components/ui/Button";
 import Icon from "../../components/AppIcon";
+import { generateQuestion, evaluateAnswer } from "../../services/api";
 
 const ModuleQuizInterface = () => {
   const navigate = useNavigate();
@@ -39,9 +40,15 @@ const ModuleQuizInterface = () => {
   const [sidebarCollapsed, setSidebarCollapsed] = useState(false);
   const [showHint, setShowHint] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
+  const [currentQuestion, setCurrentQuestion] = useState(null);
+  const [loadingQuestion, setLoadingQuestion] = useState(false);
+  const [error, setError] = useState(null);
 
-  // Mock questions data with adaptive difficulty
-  const [questions] = useState([
+  // Store questions as they come from backend
+  const [questions, setQuestions] = useState([]);
+  
+  // Fallback mock questions (only used if API fails)
+  const mockQuestions = [
     {
       id: 1,
       number: 1,
@@ -134,7 +141,76 @@ const ModuleQuizInterface = () => {
       explanation:
         "document.createElement() creates a new HTML element that can then be configured and added to the DOM using methods like appendChild().",
     },
-  ]);
+  ];
+
+  // Load first question on mount
+  useEffect(() => {
+    if (!currentQuestion && questions.length === 0) {
+      loadNextQuestion();
+    }
+  }, []);
+
+  // Load next question from backend
+  const loadNextQuestion = async () => {
+    setLoadingQuestion(true);
+    setError(null);
+    
+    try {
+      const response = await generateQuestion(
+        moduleData.id,
+        moduleData.title,
+        moduleData.topics || ['General']
+      );
+      
+      console.log('Full API response:', response);
+      
+      // Handle different response structures
+      const questionData = response.data || response;
+      console.log('Question data extracted:', questionData);
+      
+      // Validate response structure
+      if (!questionData) {
+        throw new Error('No question data received');
+      }
+      
+      if (!questionData.options || !Array.isArray(questionData.options)) {
+        console.error('Invalid options:', questionData.options);
+        throw new Error('Invalid question data structure - options missing or not an array');
+      }
+      
+      // Transform backend response to match component format
+      const formattedQuestion = {
+        id: questionData.id || `q-${Date.now()}`,
+        number: questions.length + 1,
+        text: questionData.question || 'Question text missing',
+        topic: questionData.topic || 'General',
+        difficulty: questionData.difficulty || 'medium',
+        options: questionData.options.map((opt, idx) => ({
+          id: String.fromCharCode(97 + idx), // a, b, c, d
+          label: String.fromCharCode(65 + idx), // A, B, C, D
+          text: opt
+        })),
+        explanation: questionData.explanation || 'No explanation provided',
+        correctAnswer: String.fromCharCode(97 + (questionData.correctIndex || 0))
+      };
+      
+      setCurrentQuestion(formattedQuestion);
+      setQuestions(prev => [...prev, formattedQuestion]);
+      setQuestionStartTime(Date.now());
+      
+    } catch (err) {
+      console.error('Error loading question:', err);
+      setError('Failed to load question. Using fallback.');
+      // Use mock question as fallback
+      if (mockQuestions[questions.length]) {
+        const fallbackQ = mockQuestions[questions.length];
+        setCurrentQuestion(fallbackQ);
+        setQuestions(prev => [...prev, fallbackQ]);
+      }
+    } finally {
+      setLoadingQuestion(false);
+    }
+  };
 
   // Timer effect
   useEffect(() => {
@@ -215,15 +291,21 @@ const ModuleQuizInterface = () => {
   };
 
   // Handle answer submission
-  const handleSubmitAnswer = () => {
-    if (!selectedAnswer || isSubmitted) return;
+  const handleSubmitAnswer = async () => {
+    if (!selectedAnswer || isSubmitted || !currentQuestion) return;
 
     setIsLoading(true);
 
-    // Simulate API call delay
-    setTimeout(() => {
-      const currentQuestion = questions?.[currentQuestionIndex];
-      const isCorrect = selectedAnswer === currentQuestion?.correctAnswer;
+    try {
+      // Call backend to evaluate answer
+      const answerIndex = selectedAnswer.charCodeAt(0) - 97; // a=0, b=1, c=2, d=3
+      const evaluation = await evaluateAnswer(
+        moduleData.id,
+        currentQuestion.id,
+        answerIndex
+      );
+      
+      const isCorrect = evaluation.isCorrect;
       const timeSpent = Math.floor((Date.now() - questionStartTime) / 1000);
 
       // Update streak
@@ -233,7 +315,7 @@ const ModuleQuizInterface = () => {
         setStreakCount(0);
       }
 
-      // Update difficulty and get change info
+      // Update difficulty based on backend response
       const difficultyChange = updateDifficulty(isCorrect);
 
       // Record completed question
@@ -248,38 +330,59 @@ const ModuleQuizInterface = () => {
 
       setCompletedQuestions((prev) => [...prev, questionResult]);
       setIsSubmitted(true);
-      setIsLoading(false);
-
-      // Show feedback
-      setFeedbackData({
+      
+      // Check if quiz should end based on backend response
+      if (evaluation.shouldEndQuiz) {
+        console.log('Quiz completed:', evaluation.endReason);
+      }
+    } catch (err) {
+      console.error('Error submitting answer:', err);
+      // Fallback to local evaluation
+      const isCorrect = selectedAnswer === currentQuestion?.correctAnswer;
+      const timeSpent = Math.floor((Date.now() - questionStartTime) / 1000);
+      
+      if (isCorrect) setStreakCount((prev) => prev + 1);
+      else setStreakCount(0);
+      
+      const difficultyChange = updateDifficulty(isCorrect);
+      
+      setCompletedQuestions((prev) => [...prev, {
+        questionId: currentQuestion?.id,
+        selectedAnswer,
+        correctAnswer: currentQuestion?.correctAnswer,
         isCorrect,
-        streakCount: isCorrect ? streakCount + 1 : 0,
-        difficultyChange,
-        accuracy: calculateAccuracy(),
-      });
-      setShowFeedback(true);
+        timeSpent,
+        difficulty: currentQuestion?.difficulty,
+      }]);
+      setIsSubmitted(true);
+    } finally {
+      setIsLoading(false);
+    }
 
-      // Save progress
-      saveProgress();
+    // Show feedback (moved outside try-catch)
+    const isCorrect = selectedAnswer === currentQuestion?.correctAnswer;
+    setFeedbackData({
+      isCorrect,
+      streakCount: isCorrect ? streakCount + 1 : 0,
+      difficultyChange: null,
+      accuracy: calculateAccuracy(),
+    });
+    setShowFeedback(true);
 
-      // Show toast notification
-      const message = isCorrect
-        ? "Correct! Well done."
-        : "Incorrect. Review the explanation.";
-      // Toast notification would be implemented here
-    }, 1000);
+    // Save progress
+    saveProgress();
   };
 
   // Handle next question
   const handleNextQuestion = () => {
-    if (currentQuestionIndex < questions?.length - 1) {
-      setCurrentQuestionIndex((prev) => prev + 1);
-      setSelectedAnswer(null);
-      setIsSubmitted(false);
-      setShowHint(false);
-      setQuestionStartTime(Date.now());
-      saveProgress();
-    }
+    setSelectedAnswer(null);
+    setIsSubmitted(false);
+    setShowHint(false);
+    setShowFeedback(false);
+    saveProgress();
+    
+    // Load next question from backend
+    loadNextQuestion();
   };
 
   // Handle quiz completion
@@ -337,8 +440,8 @@ const ModuleQuizInterface = () => {
     }
   };
 
-  const currentQuestion = questions?.[currentQuestionIndex];
-  const isLastQuestion = currentQuestionIndex === questions?.length - 1;
+  // Use the current loaded question
+  const isLastQuestion = completedQuestions?.length >= 20 || (completedQuestions?.length >= 10 && calculateAccuracy() >= 70);
   const accuracy = calculateAccuracy();
 
   // Learning context for breadcrumb
@@ -351,7 +454,7 @@ const ModuleQuizInterface = () => {
       totalQuestions: questions?.length,
     },
     currentQuestion: {
-      number: currentQuestionIndex + 1,
+      number: completedQuestions?.length + 1,
       topic: currentQuestion?.topic,
     },
     difficulty: currentQuestion?.difficulty,
@@ -365,11 +468,11 @@ const ModuleQuizInterface = () => {
         currentModule={{
           title: moduleData?.title,
           questionProgress: {
-            current: currentQuestionIndex + 1,
-            total: questions?.length,
+            current: completedQuestions?.length + 1,
+            total: 20, // Max questions
           },
         }}
-        overallProgress={(currentQuestionIndex / questions?.length) * 100}
+        overallProgress={(completedQuestions?.length / 20) * 100}
         totalModules={1}
       />
       <main className="pt-32 pb-8">
@@ -386,20 +489,47 @@ const ModuleQuizInterface = () => {
               {/* Quiz Header */}
               <QuizHeader
                 moduleTitle={moduleData?.title}
-                currentQuestion={currentQuestionIndex + 1}
-                totalQuestions={questions?.length}
+                currentQuestion={completedQuestions?.length + 1}
+                totalQuestions={20}
                 timeElapsed={timeElapsed}
                 onExitQuiz={handleExitQuiz}
               />
 
-              {/* Question Card */}
-              <QuestionCard
-                question={currentQuestion}
-                onAnswerSelect={handleAnswerSelect}
-                selectedAnswer={selectedAnswer}
-                showFeedback={showFeedback}
-                isSubmitted={isSubmitted}
-              />
+              {/* Question Card or Loading */}
+              {loadingQuestion ? (
+                <div className="glass-card rounded-lg p-12 text-center">
+                  <div className="w-16 h-16 mx-auto mb-6 rounded-full bg-gradient-to-br from-primary to-secondary flex items-center justify-center animate-pulse neon-glow">
+                    <Icon name="Sparkles" size={32} className="text-white" />
+                  </div>
+                  <h3 className="text-lg font-semibold text-gradient mb-2">
+                    Generating Next Question...
+                  </h3>
+                  <p className="text-sm text-muted-foreground">
+                    AI is adapting the difficulty based on your performance
+                  </p>
+                </div>
+              ) : error ? (
+                <div className="glass-card rounded-lg p-8 text-center border border-warning/20">
+                  <Icon name="AlertCircle" size={32} className="text-warning mx-auto mb-4" />
+                  <p className="text-sm text-muted-foreground mb-4">{error}</p>
+                  <Button
+                    variant="outline"
+                    onClick={loadNextQuestion}
+                    iconName="RefreshCw"
+                    iconPosition="left"
+                  >
+                    Retry
+                  </Button>
+                </div>
+              ) : currentQuestion ? (
+                <QuestionCard
+                  question={currentQuestion}
+                  onAnswerSelect={handleAnswerSelect}
+                  selectedAnswer={selectedAnswer}
+                  showFeedback={showFeedback}
+                  isSubmitted={isSubmitted}
+                />
+              ) : null}
 
               {/* Quiz Controls */}
               <QuizControls
@@ -437,7 +567,7 @@ const ModuleQuizInterface = () => {
               <div className="sticky top-32">
                 <QuizSidebar
                   questions={questions}
-                  currentQuestionIndex={currentQuestionIndex}
+                  currentQuestionIndex={completedQuestions?.length}
                   completedQuestions={completedQuestions}
                   accuracy={accuracy}
                   timeElapsed={timeElapsed}
@@ -479,7 +609,7 @@ const ModuleQuizInterface = () => {
 
           <div className="text-center">
             <div className="text-sm font-medium text-foreground">
-              {currentQuestionIndex + 1} / {questions?.length}
+              {completedQuestions?.length + 1} / 20
             </div>
             <div className="text-xs text-muted-foreground">
               {Math.round(accuracy)}% accuracy

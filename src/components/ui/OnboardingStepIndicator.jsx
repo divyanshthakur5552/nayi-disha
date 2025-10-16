@@ -17,7 +17,7 @@ const OnboardingStepIndicator = ({
     {
       id: 1,
       title: "Welcome",
-      description: "Get started with AdaptiveLearn",
+      description: "Get started with Nayi Disha",
       path: "/landing-page",
     },
     {

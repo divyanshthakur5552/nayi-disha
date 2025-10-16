@@ -84,13 +84,8 @@ const TechnologyShowcase = () => {
   };
 
   return (
-    <section className="py-20 px-6 relative overflow-hidden">
-      {/* Background Elements */}
-      <div className="absolute inset-0">
-        <div className="absolute top-1/4 left-0 w-72 h-72 bg-purple-500/10 rounded-full blur-3xl"></div>
-        <div className="absolute bottom-1/4 right-0 w-96 h-96 bg-cyan-500/10 rounded-full blur-3xl"></div>
-      </div>
-      <div className="max-w-7xl mx-auto relative z-10">
+    <section className="py-24 px-6">
+      <div className="max-w-6xl mx-auto">
         {/* Section Header */}
         <motion.div
           className="text-center mb-16"
@@ -100,12 +95,10 @@ const TechnologyShowcase = () => {
           viewport={{ once: true }}
         >
           <h2 className="text-3xl md:text-4xl font-bold text-foreground mb-4">
-            Master In-Demand <span className="text-gradient">Technologies</span>
+            Master In-Demand <span className="text-primary">Technologies</span>
           </h2>
-          <p className="text-lg text-muted-foreground max-w-2xl mx-auto">
-            Choose from popular web development technologies and get
-            personalized learning paths designed by AI to match your career
-            goals.
+          <p className="text-muted-foreground max-w-2xl mx-auto">
+            Choose from popular web development technologies and get personalized learning paths.
           </p>
         </motion.div>
 
@@ -121,79 +114,23 @@ const TechnologyShowcase = () => {
             <motion.div
               key={tech?.id}
               variants={cardVariants}
-              whileHover={{ scale: 1.02, y: -5 }}
-              className="group cursor-pointer"
+              className="group"
             >
-              <div
-                className={`glass-card border ${tech?.borderColor} rounded-xl p-8 h-full hover:border-opacity-60 transition-all duration-300`}
-              >
+              <div className="bg-card border rounded-lg p-6 h-full hover:border-primary/50 transition-colors">
                 {/* Header */}
-                <div className="flex items-center space-x-4 mb-6">
-                  <div
-                    className={`w-14 h-14 rounded-xl ${tech?.bgColor} flex items-center justify-center group-hover:scale-110 transition-transform duration-300`}
-                  >
-                    <Icon name={tech?.icon} size={24} className={tech?.color} />
+                <div className="flex items-center space-x-3 mb-4">
+                  <div className="w-10 h-10 rounded-lg bg-primary/10 flex items-center justify-center">
+                    <Icon name={tech?.icon} size={20} className="text-primary" />
                   </div>
-                  <div>
-                    <h3
-                      className={`text-2xl font-bold ${tech?.color} group-hover:text-opacity-80 transition-colors`}
-                    >
-                      {tech?.name}
-                    </h3>
-                    <div className="flex items-center space-x-2 mt-1">
-                      <div
-                        className={`w-2 h-2 ${tech?.bgColor} rounded-full animate-pulse`}
-                      ></div>
-                      <span className="text-xs text-muted-foreground">
-                        Available Now
-                      </span>
-                    </div>
-                  </div>
+                  <h3 className="text-lg font-semibold text-foreground">
+                    {tech?.name}
+                  </h3>
                 </div>
 
                 {/* Description */}
-                <p className="text-muted-foreground mb-6 leading-relaxed">
+                <p className="text-muted-foreground text-sm leading-relaxed">
                   {tech?.description}
                 </p>
-
-                {/* Features */}
-                <div className="space-y-3 mb-6">
-                  <h4 className="text-sm font-semibold text-foreground">
-                    Key Learning Areas:
-                  </h4>
-                  <div className="grid grid-cols-2 gap-2">
-                    {tech?.features?.map((feature, featureIndex) => (
-                      <div
-                        key={featureIndex}
-                        className="flex items-center space-x-2"
-                      >
-                        <div
-                          className={`w-1.5 h-1.5 ${tech?.bgColor} rounded-full`}
-                        ></div>
-                        <span className="text-sm text-muted-foreground">
-                          {feature}
-                        </span>
-                      </div>
-                    ))}
-                  </div>
-                </div>
-
-                {/* Progress Indicator */}
-                <div className="flex items-center justify-between">
-                  <div className="flex items-center space-x-2 text-xs text-muted-foreground">
-                    <Icon name="BookOpen" size={14} />
-                    <span>8-12 Modules</span>
-                  </div>
-                  <div className="flex items-center space-x-2 text-xs text-muted-foreground">
-                    <Icon name="Clock" size={14} />
-                    <span>Self-paced</span>
-                  </div>
-                </div>
-
-                {/* Hover Overlay */}
-                <div
-                  className={`absolute inset-0 bg-gradient-to-br ${tech?.bgColor} rounded-xl opacity-0 group-hover:opacity-100 transition-opacity duration-300 pointer-events-none`}
-                ></div>
               </div>
             </motion.div>
           ))}

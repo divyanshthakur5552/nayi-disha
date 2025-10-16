@@ -8,6 +8,7 @@ const RoadmapTimeline = ({
   currentFilter = "all",
   onModuleStart = null,
 }) => {
+  // Fallback default modules (only used if no modules provided)
   const defaultModules = [
     {
       id: 1,

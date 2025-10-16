@@ -20,18 +20,41 @@ const SkillLevelSelection = () => {
 
   // Load previous selections from localStorage or location state
   useEffect(() => {
-    const savedSelections = JSON.parse(
-      localStorage.getItem("adaptivelearn_selections") || "{}"
-    );
     const locationState = location?.state || {};
+    
+    // Read from the correct localStorage keys used by previous pages
+    const savedTechnology = localStorage.getItem("Nayi Disha_selected_technology");
+    const savedGoal = localStorage.getItem("Nayi Disha_selected_goal");
+    const savedSelections = JSON.parse(
+      localStorage.getItem("Nayi Disha_selections") || "{}"
+    );
+
+    let subject = "JavaScript"; // default fallback
+    let goal = "Full Stack Development"; // default fallback
+    
+    // Parse saved technology (subject)
+    if (savedTechnology) {
+      try {
+        const tech = JSON.parse(savedTechnology);
+        subject = tech?.name || tech;
+      } catch (e) {
+        console.error("Error parsing saved technology:", e);
+      }
+    }
+    
+    // Parse saved goal
+    if (savedGoal) {
+      try {
+        const goalData = JSON.parse(savedGoal);
+        goal = goalData?.title || goalData;
+      } catch (e) {
+        console.error("Error parsing saved goal:", e);
+      }
+    }
 
     const selections = {
-      subject:
-        locationState?.subject || savedSelections?.subject || "JavaScript",
-      goal:
-        locationState?.goal ||
-        savedSelections?.goal ||
-        "Full Stack Development",
+      subject: locationState?.subject || subject,
+      goal: locationState?.goal || goal,
       skillLevel: savedSelections?.skillLevel || null,
     };
 
@@ -53,7 +76,7 @@ const SkillLevelSelection = () => {
     };
     setUserSelections(updatedSelections);
     localStorage.setItem(
-      "adaptivelearn_selections",
+      "Nayi Disha_selections",
       JSON.stringify(updatedSelections)
     );
   };
@@ -65,15 +88,21 @@ const SkillLevelSelection = () => {
     setShowModal(true);
   };
 
-  const handleRoadmapComplete = () => {
+  const handleRoadmapComplete = (roadmapData) => {
     setShowModal(false);
     setIsLoading(false);
 
-    // Navigate to roadmap with all selections
+    // Save roadmap to localStorage as backup
+    if (roadmapData) {
+      localStorage.setItem('generatedRoadmap', JSON.stringify(roadmapData));
+    }
+
+    // Navigate to roadmap with all selections and data
     navigate("/ai-generated-roadmap", {
       state: {
         ...userSelections,
         skillLevel: selectedLevel,
+        roadmapData,
         isNewRoadmap: true,
       },
     });
@@ -91,7 +120,7 @@ const SkillLevelSelection = () => {
   return (
     <>
       <Helmet>
-        <title>Choose Your Skill Level - AdaptiveLearn</title>
+        <title>Choose Your Skill Level - Nayi Disha</title>
         <meta
           name="description"
           content="Select your current skill level to personalize your learning experience with AI-powered adaptive content."
@@ -155,6 +184,7 @@ const SkillLevelSelection = () => {
                 <SkillLevelCard
                   key={level}
                   level={level}
+                  technology={userSelections?.subject}
                   isSelected={selectedLevel === level}
                   onSelect={() => handleLevelSelect(level)}
                   className="h-full"

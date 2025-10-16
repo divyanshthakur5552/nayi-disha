@@ -7,37 +7,37 @@
 @layer base {
   :root {
     /* Core Colors */
-    --color-background: #0f0f23; /* deep-navy */
-    --color-foreground: #f8fafc; /* slate-50 */
-    --color-border: #334155; /* slate-600 */
-    --color-input: #1a1b3a; /* custom-surface */
-    --color-ring: #8b5cf6; /* violet-500 */
+    --color-background: #09090b; /* zinc-950 */
+    --color-foreground: #fafafa; /* zinc-50 */
+    --color-border: #27272a; /* zinc-800 */
+    --color-input: #18181b; /* zinc-900 */
+    --color-ring: #9333ea; /* purple-600 */
 
     /* Card Colors */
-    --color-card: #1a1b3a; /* custom-surface */
-    --color-card-foreground: #f8fafc; /* slate-50 */
-    --color-popover: #1a1b3a; /* custom-surface */
-    --color-popover-foreground: #f8fafc; /* slate-50 */
+    --color-card: #18181b; /* zinc-900 */
+    --color-card-foreground: #fafafa; /* zinc-50 */
+    --color-popover: #18181b; /* zinc-900 */
+    --color-popover-foreground: #fafafa; /* zinc-50 */
 
     /* Muted Colors */
-    --color-muted: #334155; /* slate-600 */
-    --color-muted-foreground: #94a3b8; /* slate-400 */
+    --color-muted: #27272a; /* zinc-800 */
+    --color-muted-foreground: #a1a1aa; /* zinc-400 */
 
     /* Primary Colors */
-    --color-primary: #8b5cf6; /* violet-500 */
+    --color-primary: #9333ea; /* purple-600 */
     --color-primary-foreground: #ffffff; /* white */
 
     /* Secondary Colors */
-    --color-secondary: #06b6d4; /* cyan-500 */
-    --color-secondary-foreground: #ffffff; /* white */
+    --color-secondary: #27272a; /* zinc-800 */
+    --color-secondary-foreground: #fafafa; /* zinc-50 */
 
     /* Destructive Colors */
-    --color-destructive: #ef4444; /* red-500 */
+    --color-destructive: #9333ea; /* purple-600 */
     --color-destructive-foreground: #ffffff; /* white */
 
     /* Accent Colors */
-    --color-accent: #10b981; /* emerald-500 */
-    --color-accent-foreground: #ffffff; /* white */
+    --color-accent: #27272a; /* zinc-800 */
+    --color-accent-foreground: #fafafa; /* zinc-50 */
 
     /* Success Colors */
     --color-success: #22c55e; /* green-500 */
@@ -48,13 +48,10 @@
     --color-warning-foreground: #000000; /* black */
 
     /* Error Colors */
-    --color-error: #ef4444; /* red-500 */
+    --color-error: #9333ea; /* purple-600 */
     --color-error-foreground: #ffffff; /* white */
 
-    /* Glassmorphism Variables */
-    --glass-bg: rgba(255, 255, 255, 0.05);
-    --glass-border: rgba(139, 92, 246, 0.2);
-    --glass-shadow: rgba(139, 92, 246, 0.25);
+    --radius: 0.5rem;
   }
 
   * {
@@ -81,50 +78,8 @@
 }
 
 @layer components {
-  .glass-card {
-    @apply backdrop-blur-md bg-white/5 border border-purple-500/20 rounded-lg shadow-lg shadow-purple-500/25;
-  }
-
-  .glass-surface {
-    @apply backdrop-blur-sm bg-white/[0.02] border border-purple-500/10;
-  }
-
-  .gradient-bg {
-    background: radial-gradient(
-      circle at 50% 50%,
-      rgba(139, 92, 246, 0.2) 0%,
-      transparent 70%
-    );
-  }
-
   .text-gradient {
-    @apply bg-gradient-to-r from-purple-400 to-cyan-400 bg-clip-text text-transparent;
-  }
-
-  .floating-action {
-    @apply shadow-lg shadow-purple-500/25 hover:shadow-xl hover:shadow-purple-500/30 transition-all duration-200;
-  }
-
-  .neon-glow {
-    box-shadow: 0 0 20px rgba(139, 92, 246, 0.3),
-      0 0 40px rgba(139, 92, 246, 0.1);
-  }
-
-  .progress-ring {
-    transform-origin: center;
-    transform: rotate(-90deg);
-  }
-
-  .animate-fade-in {
-    animation: fadeIn 0.4s ease-out;
-  }
-
-  .animate-slide-up {
-    animation: slideUp 0.3s ease-out;
-  }
-
-  .animate-spring {
-    animation: spring 0.2s cubic-bezier(0.68, -0.55, 0.265, 1.55);
+    @apply bg-gradient-to-r from-primary via-purple-500 to-purple-400 bg-clip-text text-transparent;
   }
 }
 

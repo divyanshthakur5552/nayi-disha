@@ -7,6 +7,7 @@ import RoadmapTimeline from "./components/RoadmapTimeline";
 import QuickActions from "./components/QuickActions";
 import Icon from "../../components/AppIcon";
 import Button from "../../components/ui/Button";
+import { getRoadmap } from "../../services/api";
 
 const AIGeneratedRoadmap = () => {
   const [viewMode, setViewMode] = useState("timeline");
@@ -18,22 +19,57 @@ const AIGeneratedRoadmap = () => {
   const navigate = useNavigate();
   const location = useLocation();
 
-  // Mock roadmap data - in real app this would come from localStorage or API
+  // Generate dynamic mock data based on user selections
+  const getUserSelections = () => {
+    const savedTechnology = localStorage.getItem("Nayi Disha_selected_technology");
+    const savedGoal = localStorage.getItem("Nayi Disha_selected_goal");
+    const savedSelections = localStorage.getItem("Nayi Disha_selections");
+    
+    let subject = "JavaScript";
+    let goal = "Full Stack Development";
+    let skillLevel = "intermediate";
+    
+    if (savedTechnology) {
+      try {
+        const tech = JSON.parse(savedTechnology);
+        subject = tech?.name || tech;
+      } catch (e) {}
+    }
+    
+    if (savedGoal) {
+      try {
+        const goalData = JSON.parse(savedGoal);
+        goal = goalData?.title || goalData;
+      } catch (e) {}
+    }
+    
+    if (savedSelections) {
+      try {
+        const sel = JSON.parse(savedSelections);
+        skillLevel = sel?.skillLevel || skillLevel;
+      } catch (e) {}
+    }
+    
+    return { subject, goal, skillLevel };
+  };
+  
+  const selections = getUserSelections();
+  
   const mockRoadmapData = {
-    id: "roadmap_js_fullstack_intermediate",
-    title: "JavaScript Full Stack Development",
+    id: `roadmap_${selections.subject.toLowerCase()}_${selections.goal.toLowerCase().replace(/\s+/g, '_')}_${selections.skillLevel}`,
+    title: `${selections.subject} ${selections.goal} Learning Roadmap`,
     description:
-      "A comprehensive learning path tailored to your intermediate skill level, focusing on modern JavaScript development and full-stack web applications. This roadmap adapts to your progress and provides personalized recommendations.",
+      `A comprehensive learning path tailored to your ${selections.skillLevel} skill level, focusing on ${selections.subject} for ${selections.goal}. This roadmap adapts to your progress and provides personalized recommendations.`,
     totalModules: 10,
     estimatedTime: "32-42 hours",
-    difficulty: "Intermediate",
-    completedModules: 3,
+    difficulty: selections.skillLevel.charAt(0).toUpperCase() + selections.skillLevel.slice(1),
+    completedModules: 0,
     createdAt: new Date()?.toISOString(),
     lastUpdated: new Date()?.toISOString(),
     userSelections: {
-      subject: "JavaScript",
-      goal: "Full Stack Development",
-      skillLevel: "Intermediate",
+      subject: selections.subject,
+      goal: selections.goal,
+      skillLevel: selections.skillLevel.charAt(0).toUpperCase() + selections.skillLevel.slice(1),
     },
     aiRecommendations: [
       "Focus on practical projects to reinforce theoretical concepts",
@@ -41,33 +77,68 @@ const AIGeneratedRoadmap = () => {
       "Join developer communities for peer learning and support",
       "Build a portfolio project after completing each major section",
     ],
-    overallProgress: 30,
+    overallProgress: 0,
   };
 
   useEffect(() => {
-    // Simulate loading roadmap data
-    setIsLoading(true);
-
-    // Check if coming from skill level selection with new roadmap
-    const isNewRoadmap = location?.state?.fromSkillSelection;
-
-    setTimeout(() => {
-      // In real app, load from localStorage or generate new roadmap
-      const savedRoadmap = localStorage.getItem("adaptivelearn_roadmap");
-
-      if (savedRoadmap && !isNewRoadmap) {
-        setRoadmapData(JSON.parse(savedRoadmap));
-      } else {
-        // Generate new roadmap or use mock data
-        setRoadmapData(mockRoadmapData);
-        localStorage.setItem(
-          "adaptivelearn_roadmap",
-          JSON.stringify(mockRoadmapData)
-        );
+    const loadRoadmap = async () => {
+      setIsLoading(true);
+      
+      try {
+        // Check if we have fresh data from generation
+        const stateRoadmap = location?.state?.roadmapData;
+        
+        if (stateRoadmap) {
+          // Use freshly generated roadmap
+          const enhancedData = {
+            ...stateRoadmap,
+            completedModules: 0,
+            overallProgress: 0,
+            createdAt: new Date().toISOString(),
+            lastUpdated: new Date().toISOString(),
+            userSelections: {
+              subject: location?.state?.subject || "JavaScript",
+              goal: location?.state?.goal || "Full Stack Development",
+              skillLevel: location?.state?.skillLevel || "intermediate",
+            },
+          };
+          
+          setRoadmapData(enhancedData);
+          localStorage.setItem("Nayi Disha_roadmap", JSON.stringify(enhancedData));
+        } else {
+          // Try to load from localStorage first
+          const cached = localStorage.getItem("generatedRoadmap");
+          
+          if (cached) {
+            const cachedData = JSON.parse(cached);
+            setRoadmapData(cachedData);
+          } else {
+            // Try to fetch from backend
+            const backendData = await getRoadmap();
+            
+            if (backendData) {
+              setRoadmapData(backendData);
+            } else {
+              // Fall back to mock data if nothing else works
+              setRoadmapData(mockRoadmapData);
+            }
+          }
+        }
+      } catch (error) {
+        console.error("Error loading roadmap:", error);
+        // Fall back to mock data on error
+        const cachedMock = localStorage.getItem("Nayi Disha_roadmap");
+        if (cachedMock) {
+          setRoadmapData(JSON.parse(cachedMock));
+        } else {
+          setRoadmapData(mockRoadmapData);
+        }
+      } finally {
+        setIsLoading(false);
       }
-
-      setIsLoading(false);
-    }, 1500);
+    };
+    
+    loadRoadmap();
   }, [location?.state]);
 
   const handleFilterChange = (filter) => {
@@ -81,7 +152,7 @@ const AIGeneratedRoadmap = () => {
   const handleModuleStart = (module) => {
     // Save current module to localStorage
     localStorage.setItem(
-      "adaptivelearn_current_module",
+      "Nayi Disha_current_module",
       JSON.stringify(module)
     );
 
@@ -120,7 +191,7 @@ const AIGeneratedRoadmap = () => {
         setIsLoading(true);
         setTimeout(() => {
           // Reset roadmap and navigate to skill selection
-          localStorage.removeItem("adaptivelearn_roadmap");
+          localStorage.removeItem("Nayi Disha_roadmap");
           navigate("/skill-level-selection");
         }, 1000);
         break;
@@ -148,9 +219,6 @@ const AIGeneratedRoadmap = () => {
           <div className="container mx-auto px-6">
             <div className="flex items-center justify-center min-h-[60vh]">
               <div className="text-center">
-                <div className="w-16 h-16 mx-auto mb-6 rounded-full bg-gradient-to-br from-primary to-secondary flex items-center justify-center animate-pulse neon-glow">
-                  <Icon name="Zap" size={32} className="text-white" />
-                </div>
                 <h2 className="text-2xl font-bold text-gradient mb-3">
                   Generating Your Roadmap
                 </h2>
@@ -191,6 +259,7 @@ const AIGeneratedRoadmap = () => {
               />
 
               <RoadmapTimeline
+                modules={roadmapData?.modules || []}
                 viewMode={viewMode}
                 currentFilter={currentFilter}
                 onModuleStart={handleModuleStart}
