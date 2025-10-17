@@ -4,9 +4,12 @@ import { useNavigate } from "react-router-dom";
 import Cropper from "react-easy-crop";
 import { CircularProgressbar, buildStyles } from "react-circular-progressbar";
 import "react-circular-progressbar/dist/styles.css";
+import { useAuth } from "../../contexts/AuthContext";
+import { userService } from "../../services/userService";
 
 export default function ProfileModal({ isOpen, onClose }) {
   const navigate = useNavigate();
+  const { user } = useAuth();
 
   // --- Profile states ---
   const [image, setImage] = useState(null);
@@ -17,28 +20,99 @@ export default function ProfileModal({ isOpen, onClose }) {
   const [showCropper, setShowCropper] = useState(false);
   const [name, setName] = useState("");
   const [username, setUsername] = useState("");
+  const [loading, setLoading] = useState(true);
+  const [progress, setProgress] = useState(null);
 
-  // --- Skill Data ---
-  const skills = [
-    { name: "React", value: 90 },
-    { name: "JavaScript", value: 85 },
-    { name: "TypeScript", value: 80 },
-    { name: "CSS", value: 88 },
-    { name: "Node.js", value: 75 },
-    { name: "UI/UX", value: 82 },
-  ];
+  // --- Skill Data (calculated from progress) ---
+  const [skills, setSkills] = useState([]);
 
-  // --- Generate random name & username on first load ---
+  // --- Load user data from database ---
   useEffect(() => {
-    if (!name) {
-      const randomNum = Math.floor(Math.random() * 1000);
-      setName(`Guest${randomNum}`);
+    const loadUserData = async () => {
+      if (!user) {
+        setLoading(false);
+        return;
+      }
+
+      try {
+        setLoading(true);
+        
+        // Load user profile and progress
+        const userProgress = await userService.getProgress(user.uid);
+        
+        // Set user name and email
+        setName(user.displayName || user.email.split('@')[0]);
+        setUsername(`@${user.email.split('@')[0]}`);
+        
+        if (user.photoURL) {
+          setCroppedImage(user.photoURL);
+        }
+        
+        if (userProgress) {
+          setProgress(userProgress);
+          
+          // Calculate skills from completed modules and scores
+          const calculatedSkills = calculateSkillsFromProgress(userProgress);
+          setSkills(calculatedSkills);
+        } else {
+          // No progress yet - show empty state
+          setSkills([]);
+        }
+      } catch (error) {
+        console.error('Error loading user data:', error);
+        // Fallback to basic user info
+        setName(user.displayName || user.email.split('@')[0]);
+        setUsername(`@${user.email.split('@')[0]}`);
+        setSkills([]);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    loadUserData();
+  }, [user]);
+
+  // Calculate skills based on completed modules and scores
+  const calculateSkillsFromProgress = (userProgress) => {
+    if (!userProgress || !userProgress.quiz_scores) {
+      return [];
     }
-    if (!username) {
-      const randomStr = Math.random().toString(36).substring(2, 6);
-      setUsername(`@user_${randomStr}`);
+
+    const scores = userProgress.quiz_scores || {};
+    const completedModules = userProgress.completed_modules || [];
+    const roadmap = userProgress.roadmap;
+    
+    if (!roadmap || !roadmap.modules) {
+      return [];
     }
-  }, []);
+
+    // Group modules by topic/skill and calculate average scores
+    const skillMap = {};
+    
+    roadmap.modules.forEach(module => {
+      const moduleId = module.id;
+      const score = scores[moduleId] || 0;
+      const topic = module.topic || module.title;
+      
+      if (!skillMap[topic]) {
+        skillMap[topic] = { total: 0, count: 0 };
+      }
+      
+      if (completedModules.includes(moduleId)) {
+        skillMap[topic].total += score;
+        skillMap[topic].count += 1;
+      }
+    });
+
+    // Convert to skills array
+    return Object.entries(skillMap)
+      .filter(([_, data]) => data.count > 0)
+      .map(([name, data]) => ({
+        name,
+        value: Math.round(data.total / data.count)
+      }))
+      .slice(0, 6); // Top 6 skills
+  };
 
   // --- Default avatar fallback ---
   const defaultAvatar = `https://api.dicebear.com/7.x/avataaars/svg?seed=${username}`;
@@ -174,31 +248,57 @@ export default function ProfileModal({ isOpen, onClose }) {
               onChange={(e) => setUsername(e.target.value)}
               className="text-gray-400 text-sm bg-transparent text-center outline-none border-b border-gray-700 focus:border-indigo-500 transition mb-3"
             />
-            <span className="bg-indigo-600 text-white px-4 py-1 rounded-full text-sm font-semibold mb-8 inline-block">
-              Rank #42
-            </span>
+            {/* Overall Progress */}
+            {progress && (
+              <div className="bg-indigo-600/10 border border-indigo-600/20 px-4 py-2 rounded-full text-sm font-semibold mb-8 inline-block">
+                <span className="text-indigo-400">Overall Progress: </span>
+                <span className="text-white">{Math.round(progress.overall_progress || 0)}%</span>
+                <span className="text-gray-400 ml-2">• {progress.completed_modules?.length || 0} modules completed</span>
+              </div>
+            )}
 
             {/* Skills */}
-            <h2 className="text-xl font-semibold text-gray-100 mb-6">Skills</h2>
-            <div className="grid grid-cols-3 gap-6">
-              {skills.map((skill, index) => (
-                <div key={index} className="flex flex-col items-center">
-                  <div className="w-16 h-16 mb-2">
-                    <CircularProgressbar
-                      value={skill.value}
-                      text={`${skill.value}%`}
-                      styles={buildStyles({
-                        textSize: "24px",
-                        pathColor: "#6366f1",
-                        textColor: "#e5e7eb",
-                        trailColor: "#1f2937",
-                      })}
-                    />
+            <h2 className="text-xl font-semibold text-gray-100 mb-6">
+              {skills.length > 0 ? 'Skills' : (loading ? 'Loading...' : 'No Skills Yet')}
+            </h2>
+            
+            {loading ? (
+              <div className="text-center py-8">
+                <div className="animate-spin w-8 h-8 border-2 border-indigo-600 border-t-transparent rounded-full mx-auto"></div>
+              </div>
+            ) : skills.length > 0 ? (
+              <div className="grid grid-cols-3 gap-6">
+                {skills.map((skill, index) => (
+                  <div key={index} className="flex flex-col items-center">
+                    <div className="w-16 h-16 mb-2">
+                      <CircularProgressbar
+                        value={skill.value}
+                        text={`${skill.value}%`}
+                        styles={buildStyles({
+                          textSize: "24px",
+                          pathColor: "#6366f1",
+                          textColor: "#e5e7eb",
+                          trailColor: "#1f2937",
+                        })}
+                      />
+                    </div>
+                    <span className="text-xs text-gray-400">{skill.name}</span>
                   </div>
-                  <span className="text-xs text-gray-400">{skill.name}</span>
-                </div>
-              ))}
-            </div>
+                ))}
+              </div>
+            ) : (
+              <div className="text-center py-8">
+                <p className="text-gray-400 text-sm mb-4">
+                  Complete some modules to see your skills here!
+                </p>
+                <button
+                  onClick={() => navigate('/ai-generated-roadmap')}
+                  className="px-4 py-2 bg-indigo-600 text-white rounded-lg hover:bg-indigo-700 transition text-sm"
+                >
+                  Start Learning
+                </button>
+              </div>
+            )}
           </motion.div>
 
           {/* Crop Modal */}

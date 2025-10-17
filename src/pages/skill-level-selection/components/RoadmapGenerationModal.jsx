@@ -2,6 +2,8 @@ import React, { useState, useEffect } from "react";
 import Icon from "../../../components/AppIcon";
 import Button from "../../../components/ui/Button";
 import { generateRoadmap } from "../../../services/api";
+import { useAuth } from "../../../contexts/AuthContext";
+import { userService } from "../../../services/userService";
 
 const RoadmapGenerationModal = ({
   isOpen,
@@ -9,11 +11,13 @@ const RoadmapGenerationModal = ({
   userSelections,
   onComplete,
 }) => {
+  const { user } = useAuth();
   const [currentStep, setCurrentStep] = useState(0);
   const [progress, setProgress] = useState(0);
   const [isGenerating, setIsGenerating] = useState(false);
   const [error, setError] = useState(null);
   const [generatedRoadmap, setGeneratedRoadmap] = useState(null);
+  const [existingRoadmap, setExistingRoadmap] = useState(null);
 
   const generationSteps = [
     {
@@ -70,7 +74,33 @@ const RoadmapGenerationModal = ({
       try {
         setError(null);
 
-        // Start visual progress animation
+        // Check if user is logged in
+        if (!user) {
+          setError("Please sign in to generate a roadmap.");
+          setIsGenerating(false);
+          return;
+        }
+
+        // Check if roadmap already exists
+        setCurrentStep(0);
+        setProgress(10);
+        
+        const existingProgress = await userService.getProgress(user.uid);
+        
+        if (existingProgress && existingProgress.roadmap) {
+          // Roadmap already exists, use it instead of generating new one
+          setExistingRoadmap(existingProgress.roadmap);
+          setProgress(100);
+          setCurrentStep(generationSteps.length - 1);
+          
+          setTimeout(() => {
+            setIsGenerating(false);
+            onComplete(existingProgress.roadmap);
+          }, 1000);
+          return;
+        }
+
+        // Start visual progress animation for new roadmap generation
         for (let i = 0; i < 2; i++) {
           setCurrentStep(i);
           const stepDuration = generationSteps?.[i]?.duration;
@@ -97,6 +127,16 @@ const RoadmapGenerationModal = ({
 
         setGeneratedRoadmap(roadmapData);
         setProgress(70);
+
+        // Save roadmap to database with initialized progress
+        await userService.saveRoadmap(user.uid, roadmapData, {
+          subject: userSelections?.subject,
+          goal: userSelections?.goal,
+          skillLevel: userSelections?.skillLevel,
+          selectedSubjects: [userSelections?.subject]
+        });
+        
+        setProgress(75);
 
         // Continue with remaining visual steps
         for (let i = 2; i < generationSteps?.length; i++) {

@@ -11,10 +11,13 @@ import QuizSidebar from "./components/QuizSidebar";
 import Button from "../../components/ui/Button";
 import Icon from "../../components/AppIcon";
 import { generateQuestion, evaluateAnswer } from "../../services/api";
+import { useAuth } from "../../contexts/AuthContext";
+import { userService } from "../../services/userService";
 
 const ModuleQuizInterface = () => {
   const navigate = useNavigate();
   const location = useLocation();
+  const { user } = useAuth();
 
   // Get module data from navigation state or use default
   const moduleData = location?.state?.module || {
@@ -395,7 +398,7 @@ const ModuleQuizInterface = () => {
   };
 
   // Handle quiz completion
-  const handleFinishQuiz = () => {
+  const handleFinishQuiz = async () => {
     const finalAccuracy = calculateAccuracy();
     const totalTime = timeElapsed;
 
@@ -414,6 +417,20 @@ const ModuleQuizInterface = () => {
       `quiz_results_${moduleData?.id}`,
       JSON.stringify(quizResults)
     );
+
+    // Save to database if user is logged in
+    if (user && finalAccuracy >= 70) {
+      try {
+        await userService.updateModuleProgress(user.uid, moduleData?.id, {
+          quizScore: finalAccuracy,
+          currentModule: null // Clear current module since it's completed
+        });
+        console.log('Module progress saved to database');
+      } catch (error) {
+        console.error('Error saving module progress:', error);
+        // Continue even if DB save fails
+      }
+    }
 
     // Navigate to results or roadmap
     navigate("/ai-generated-roadmap", {

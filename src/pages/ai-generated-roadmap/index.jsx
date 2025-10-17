@@ -8,6 +8,8 @@ import QuickActions from "./components/QuickActions";
 import Icon from "../../components/AppIcon";
 import Button from "../../components/ui/Button";
 import { getRoadmap } from "../../services/api";
+import { useAuth } from "../../contexts/AuthContext";
+import { userService } from "../../services/userService";
 
 const AIGeneratedRoadmap = () => {
   const [viewMode, setViewMode] = useState("timeline");
@@ -15,9 +17,11 @@ const AIGeneratedRoadmap = () => {
   const [isLoading, setIsLoading] = useState(false);
   const [roadmapData, setRoadmapData] = useState(null);
   const [showQuickActions, setShowQuickActions] = useState(true);
+  const [userProgress, setUserProgress] = useState(null);
 
   const navigate = useNavigate();
   const location = useLocation();
+  const { user } = useAuth();
 
   // Generate dynamic mock data based on user selections
   const getUserSelections = () => {
@@ -92,64 +96,74 @@ const AIGeneratedRoadmap = () => {
       setIsLoading(true);
 
       try {
-        // Check if we have fresh data from generation
-        const stateRoadmap = location?.state?.roadmapData;
+        // Check if user is logged in
+        if (!user) {
+          setIsLoading(false);
+          return;
+        }
 
-        if (stateRoadmap) {
-          // Use freshly generated roadmap
-          const enhancedData = {
-            ...stateRoadmap,
-            completedModules: 0,
-            overallProgress: 0,
-            createdAt: new Date().toISOString(),
-            lastUpdated: new Date().toISOString(),
+        // Load from database first
+        const progress = await userService.getProgress(user.uid);
+        
+        if (progress && progress.roadmap) {
+          setUserProgress(progress);
+          
+          // Enhance roadmap with progress data
+          const enhancedRoadmap = {
+            ...progress.roadmap,
+            completedModules: progress.completed_modules?.length || 0,
+            overallProgress: progress.overall_progress || 0,
             userSelections: {
-              subject: location?.state?.subject || "JavaScript",
-              goal: location?.state?.goal || "Full Stack Development",
-              skillLevel: location?.state?.skillLevel || "intermediate",
+              subject: progress.selected_subjects?.[0] || "JavaScript",
+              goal: progress.goal || "Full Stack Development",
+              skillLevel: progress.skill_level || "intermediate",
             },
+            // Mark modules as completed based on progress
+            modules: progress.roadmap.modules?.map(module => ({
+              ...module,
+              status: progress.completed_modules?.includes(module.id) 
+                ? "completed" 
+                : progress.current_module === module.id
+                ? "in-progress"
+                : "available",
+              score: progress.quiz_scores?.[module.id] || 0
+            })) || []
           };
 
-          setRoadmapData(enhancedData);
-          localStorage.setItem(
-            "Nayi Disha_roadmap",
-            JSON.stringify(enhancedData)
-          );
+          setRoadmapData(enhancedRoadmap);
         } else {
-          // Try to load from localStorage first
-          const cached = localStorage.getItem("generatedRoadmap");
-
-          if (cached) {
-            const cachedData = JSON.parse(cached);
-            setRoadmapData(cachedData);
+          // No roadmap in database, check if freshly generated
+          const stateRoadmap = location?.state?.roadmapData;
+          
+          if (stateRoadmap) {
+            const enhancedData = {
+              ...stateRoadmap,
+              completedModules: 0,
+              overallProgress: 0,
+              createdAt: new Date().toISOString(),
+              lastUpdated: new Date().toISOString(),
+              userSelections: {
+                subject: location?.state?.subject || "JavaScript",
+                goal: location?.state?.goal || "Full Stack Development",
+                skillLevel: location?.state?.skillLevel || "intermediate",
+              },
+            };
+            setRoadmapData(enhancedData);
           } else {
-            // Try to fetch from backend
-            const backendData = await getRoadmap();
-
-            if (backendData) {
-              setRoadmapData(backendData);
-            } else {
-              // Fall back to mock data if nothing else works
-              setRoadmapData(mockRoadmapData);
-            }
+            // No roadmap at all - user needs to generate one
+            setRoadmapData(null);
           }
         }
       } catch (error) {
         console.error("Error loading roadmap:", error);
-        // Fall back to mock data on error
-        const cachedMock = localStorage.getItem("Nayi Disha_roadmap");
-        if (cachedMock) {
-          setRoadmapData(JSON.parse(cachedMock));
-        } else {
-          setRoadmapData(mockRoadmapData);
-        }
+        setRoadmapData(null);
       } finally {
         setIsLoading(false);
       }
     };
 
     loadRoadmap();
-  }, [location?.state]);
+  }, [user, location?.state]);
 
   const handleFilterChange = (filter) => {
     setCurrentFilter(filter);
