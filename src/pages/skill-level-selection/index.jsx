@@ -21,9 +21,11 @@ const SkillLevelSelection = () => {
   // Load previous selections from localStorage or location state
   useEffect(() => {
     const locationState = location?.state || {};
-    
+
     // Read from the correct localStorage keys used by previous pages
-    const savedTechnology = localStorage.getItem("Nayi Disha_selected_technology");
+    const savedTechnology = localStorage.getItem(
+      "Nayi Disha_selected_technology"
+    );
     const savedGoal = localStorage.getItem("Nayi Disha_selected_goal");
     const savedSelections = JSON.parse(
       localStorage.getItem("Nayi Disha_selections") || "{}"
@@ -31,7 +33,7 @@ const SkillLevelSelection = () => {
 
     let subject = "JavaScript"; // default fallback
     let goal = "Full Stack Development"; // default fallback
-    
+
     // Parse saved technology (subject)
     if (savedTechnology) {
       try {
@@ -41,7 +43,7 @@ const SkillLevelSelection = () => {
         console.error("Error parsing saved technology:", e);
       }
     }
-    
+
     // Parse saved goal
     if (savedGoal) {
       try {
@@ -94,7 +96,7 @@ const SkillLevelSelection = () => {
 
     // Save roadmap to localStorage as backup
     if (roadmapData) {
-      localStorage.setItem('generatedRoadmap', JSON.stringify(roadmapData));
+      localStorage.setItem("generatedRoadmap", JSON.stringify(roadmapData));
     }
 
     // Navigate to roadmap with all selections and data
@@ -126,7 +128,7 @@ const SkillLevelSelection = () => {
           content="Select your current skill level to personalize your learning experience with AI-powered adaptive content."
         />
       </Helmet>
-      <div className="min-h-screen bg-background">
+      <div className="min-h-screen bg-[#000]">
         <Header />
 
         <main className="pt-24 pb-12">
@@ -142,18 +144,21 @@ const SkillLevelSelection = () => {
 
             {/* Hero Section */}
             <div className="text-center mb-12">
-              <div className="w-20 h-20 mx-auto mb-6 rounded-full bg-gradient-to-br from-primary to-secondary flex items-center justify-center neon-glow">
+              <div className="w-20 h-20 mx-auto mb-6 rounded-full bg-[#171717] flex items-center justify-center neon-glow">
                 <Icon name="BarChart3" size={40} className="text-white" />
               </div>
 
-              <h1 className="text-4xl md:text-5xl font-bold text-gradient mb-4">
-                What's Your Current Level?
+              <h1 className="text-4xl md:text-5xl font-bold text-white mb-4">
+                What's Your <span className="text-primary">Current </span>
+                Level?
               </h1>
 
-              <p className="text-xl text-muted-foreground max-w-3xl mx-auto mb-6">
+              <p className="text-xl text-muted-foreground max-w-4xl tracking-tighter mx-auto mb-6">
                 Help us understand your current expertise so we can create the
-                perfect learning path. Our AI will adjust question difficulty,
-                module complexity, and pacing based on your selection.
+                perfect learning path.
+                <br />
+                Our AI will adjust question difficulty, module complexity, and
+                pacing based on your selection.
               </p>
 
               {/* Current Selections Summary */}

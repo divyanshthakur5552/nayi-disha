@@ -12,16 +12,16 @@ const GoalSelectionHeader = ({
       {/* Main Heading */}
       <div className="space-y-4">
         <div className="flex items-center justify-center space-x-3 mb-4">
-          <div className="w-12 h-12 rounded-full bg-gradient-to-br from-primary to-secondary flex items-center justify-center neon-glow">
-            <Icon name="Target" size={24} className="text-white" />
+          <div className="w-12 h-12 rounded-full  flex items-center justify-center ">
+            <Icon name="Target" size={30} className="text-white" />
           </div>
         </div>
 
-        <h1 className="text-3xl md:text-4xl font-bold text-gradient">
+        <h1 className="text-3xl md:text-4xl font-bold text-[#f5f5f5]">
           Choose Your Learning Goal
         </h1>
 
-        <p className="text-lg text-muted-foreground max-w-2xl mx-auto leading-relaxed">
+        <p className="text-lg text-[#a3a3a3] text-muted-foreground max-w-2xl mx-auto leading-relaxed">
           Define your career objective to get a personalized roadmap tailored to
           your aspirations. Each path is designed to maximize your learning
           efficiency and career readiness.
@@ -30,7 +30,7 @@ const GoalSelectionHeader = ({
 
       {/* Selected Subject Context */}
       {selectedSubject && (
-        <div className="glass-surface border border-purple-500/10 rounded-lg p-4 max-w-md mx-auto">
+        <div className="glass-surface border border-purple-500/10 rounded-lg p-4 max-w-md shadow-[0_20px_50px_rgba(74,26,125,0.8)] mx-auto">
           <div className="flex items-center justify-center space-x-3">
             <Icon name="Code2" size={20} className="text-primary" />
             <div className="text-center">

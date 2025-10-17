@@ -51,6 +51,7 @@ const SubjectSelection = () => {
         "Build interactive web applications",
         "Understand asynchronous programming",
         "Work with APIs and databases",
+        "Work with APIs and databases",
       ],
       estimatedModules: 12,
       estimatedHours: 30,
@@ -72,6 +73,7 @@ const SubjectSelection = () => {
         "Master React components and hooks",
         "Build responsive user interfaces",
         "Manage application state effectively",
+        "Deploy production-ready applications",
         "Deploy production-ready applications",
       ],
       estimatedModules: 8,
@@ -148,7 +150,7 @@ const SubjectSelection = () => {
   };
 
   return (
-    <div className="min-h-screen bg-background">
+    <div className="min-h-screen bg-[radial-gradient(circle_at_bottom,_#000000_0%,_rgba(74,26,125,0.5)_0.1%,_#000000_70%)] ">
       <Header />
       <main className="pt-24 pb-16">
         <div className="container mx-auto px-6">

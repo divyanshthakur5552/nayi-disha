@@ -18,13 +18,13 @@ const GoalCard = ({ goal, isSelected, onSelect, className = "" }) => {
   const getGoalGradient = (goalType) => {
     switch (goalType) {
       case "web-development":
-        return "from-blue-500 to-cyan-500";
+        return "from--500 to-cyan-500";
       case "data-structures":
-        return "from-green-500 to-emerald-500";
+        return "from--500 to-emerald-500";
       case "full-stack":
-        return "from-purple-500 to-pink-500";
+        return "from-p-500 to-pink-500";
       default:
-        return "from-primary to-secondary";
+        return "from- to-secondary";
     }
   };
 
@@ -39,7 +39,7 @@ const GoalCard = ({ goal, isSelected, onSelect, className = "" }) => {
     >
       <div
         className={`
-          glass-card border-2 transition-all duration-300 p-6 h-full
+          bg-[#171717]/300 rounded-xl border border-[#737373]  transition-all duration-300 p-6 h-full
           ${
             isSelected
               ? "border-primary neon-glow bg-primary/5"
@@ -49,7 +49,7 @@ const GoalCard = ({ goal, isSelected, onSelect, className = "" }) => {
       >
         {/* Selection Indicator */}
         {isSelected && (
-          <div className="absolute top-4 right-4 w-6 h-6 bg-primary rounded-full flex items-center justify-center animate-spring">
+          <div className="absolute top-4 right-4 w-6 h-6 bg-primary rounded-full flex items-center justify-center ">
             <Icon name="Check" size={16} className="text-white" />
           </div>
         )}

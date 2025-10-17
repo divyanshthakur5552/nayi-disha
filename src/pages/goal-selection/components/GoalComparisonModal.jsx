@@ -45,7 +45,7 @@ const GoalComparisonModal = ({
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/50 backdrop-blur-sm">
-      <div className="glass-card border border-purple-500/20 rounded-lg w-full max-w-4xl max-h-[90vh] overflow-hidden">
+      <div className="backdrop-blur-mxl bg[#0a0a0a]/500 border border-purple-500/20 rounded-lg w-full max-w-4xl max-h-[90vh] ">
         {/* Header */}
         <div className="flex items-center justify-between p-6 border-b border-purple-500/20">
           <div>

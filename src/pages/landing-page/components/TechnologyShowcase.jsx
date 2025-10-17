@@ -84,7 +84,7 @@ const TechnologyShowcase = () => {
   };
 
   return (
-    <section className="py-24 px-6">
+    <section className="py-24 px-6 ">
       <div className="max-w-6xl mx-auto">
         {/* Section Header */}
         <motion.div
@@ -98,7 +98,8 @@ const TechnologyShowcase = () => {
             Master In-Demand <span className="text-primary">Technologies</span>
           </h2>
           <p className="text-muted-foreground max-w-2xl mx-auto">
-            Choose from popular web development technologies and get personalized learning paths.
+            Choose from popular web development technologies and get
+            personalized learning paths.
           </p>
         </motion.div>
 
@@ -120,7 +121,11 @@ const TechnologyShowcase = () => {
                 {/* Header */}
                 <div className="flex items-center space-x-3 mb-4">
                   <div className="w-10 h-10 rounded-lg bg-primary/10 flex items-center justify-center">
-                    <Icon name={tech?.icon} size={20} className="text-primary" />
+                    <Icon
+                      name={tech?.icon}
+                      size={20}
+                      className="text-primary"
+                    />
                   </div>
                   <h3 className="text-lg font-semibold text-foreground">
                     {tech?.name}

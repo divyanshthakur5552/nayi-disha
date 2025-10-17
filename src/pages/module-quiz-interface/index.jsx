@@ -46,7 +46,7 @@ const ModuleQuizInterface = () => {
 
   // Store questions as they come from backend
   const [questions, setQuestions] = useState([]);
-  
+
   // Fallback mock questions (only used if API fails)
   const mockQuestions = [
     {
@@ -154,58 +154,61 @@ const ModuleQuizInterface = () => {
   const loadNextQuestion = async () => {
     setLoadingQuestion(true);
     setError(null);
-    
+
     try {
       const response = await generateQuestion(
         moduleData.id,
         moduleData.title,
-        moduleData.topics || ['General']
+        moduleData.topics || ["General"]
       );
-      
-      console.log('Full API response:', response);
-      
+
+      console.log("Full API response:", response);
+
       // Handle different response structures
       const questionData = response.data || response;
-      console.log('Question data extracted:', questionData);
-      
+      console.log("Question data extracted:", questionData);
+
       // Validate response structure
       if (!questionData) {
-        throw new Error('No question data received');
+        throw new Error("No question data received");
       }
-      
+
       if (!questionData.options || !Array.isArray(questionData.options)) {
-        console.error('Invalid options:', questionData.options);
-        throw new Error('Invalid question data structure - options missing or not an array');
+        console.error("Invalid options:", questionData.options);
+        throw new Error(
+          "Invalid question data structure - options missing or not an array"
+        );
       }
-      
+
       // Transform backend response to match component format
       const formattedQuestion = {
         id: questionData.id || `q-${Date.now()}`,
         number: questions.length + 1,
-        text: questionData.question || 'Question text missing',
-        topic: questionData.topic || 'General',
-        difficulty: questionData.difficulty || 'medium',
+        text: questionData.question || "Question text missing",
+        topic: questionData.topic || "General",
+        difficulty: questionData.difficulty || "medium",
         options: questionData.options.map((opt, idx) => ({
           id: String.fromCharCode(97 + idx), // a, b, c, d
           label: String.fromCharCode(65 + idx), // A, B, C, D
-          text: opt
+          text: opt,
         })),
-        explanation: questionData.explanation || 'No explanation provided',
-        correctAnswer: String.fromCharCode(97 + (questionData.correctIndex || 0))
+        explanation: questionData.explanation || "No explanation provided",
+        correctAnswer: String.fromCharCode(
+          97 + (questionData.correctIndex || 0)
+        ),
       };
-      
+
       setCurrentQuestion(formattedQuestion);
-      setQuestions(prev => [...prev, formattedQuestion]);
+      setQuestions((prev) => [...prev, formattedQuestion]);
       setQuestionStartTime(Date.now());
-      
     } catch (err) {
-      console.error('Error loading question:', err);
-      setError('Failed to load question. Using fallback.');
+      console.error("Error loading question:", err);
+      setError("Failed to load question. Using fallback.");
       // Use mock question as fallback
       if (mockQuestions[questions.length]) {
         const fallbackQ = mockQuestions[questions.length];
         setCurrentQuestion(fallbackQ);
-        setQuestions(prev => [...prev, fallbackQ]);
+        setQuestions((prev) => [...prev, fallbackQ]);
       }
     } finally {
       setLoadingQuestion(false);
@@ -304,7 +307,7 @@ const ModuleQuizInterface = () => {
         currentQuestion.id,
         answerIndex
       );
-      
+
       const isCorrect = evaluation.isCorrect;
       const timeSpent = Math.floor((Date.now() - questionStartTime) / 1000);
 
@@ -330,30 +333,33 @@ const ModuleQuizInterface = () => {
 
       setCompletedQuestions((prev) => [...prev, questionResult]);
       setIsSubmitted(true);
-      
+
       // Check if quiz should end based on backend response
       if (evaluation.shouldEndQuiz) {
-        console.log('Quiz completed:', evaluation.endReason);
+        console.log("Quiz completed:", evaluation.endReason);
       }
     } catch (err) {
-      console.error('Error submitting answer:', err);
+      console.error("Error submitting answer:", err);
       // Fallback to local evaluation
       const isCorrect = selectedAnswer === currentQuestion?.correctAnswer;
       const timeSpent = Math.floor((Date.now() - questionStartTime) / 1000);
-      
+
       if (isCorrect) setStreakCount((prev) => prev + 1);
       else setStreakCount(0);
-      
+
       const difficultyChange = updateDifficulty(isCorrect);
-      
-      setCompletedQuestions((prev) => [...prev, {
-        questionId: currentQuestion?.id,
-        selectedAnswer,
-        correctAnswer: currentQuestion?.correctAnswer,
-        isCorrect,
-        timeSpent,
-        difficulty: currentQuestion?.difficulty,
-      }]);
+
+      setCompletedQuestions((prev) => [
+        ...prev,
+        {
+          questionId: currentQuestion?.id,
+          selectedAnswer,
+          correctAnswer: currentQuestion?.correctAnswer,
+          isCorrect,
+          timeSpent,
+          difficulty: currentQuestion?.difficulty,
+        },
+      ]);
       setIsSubmitted(true);
     } finally {
       setIsLoading(false);
@@ -380,7 +386,7 @@ const ModuleQuizInterface = () => {
     setShowHint(false);
     setShowFeedback(false);
     saveProgress();
-    
+
     // Load next question from backend
     loadNextQuestion();
   };
@@ -441,7 +447,9 @@ const ModuleQuizInterface = () => {
   };
 
   // Use the current loaded question
-  const isLastQuestion = completedQuestions?.length >= 20 || (completedQuestions?.length >= 10 && calculateAccuracy() >= 70);
+  const isLastQuestion =
+    completedQuestions?.length >= 20 ||
+    (completedQuestions?.length >= 10 && calculateAccuracy() >= 70);
   const accuracy = calculateAccuracy();
 
   // Learning context for breadcrumb
@@ -461,7 +469,7 @@ const ModuleQuizInterface = () => {
   };
 
   return (
-    <div className="min-h-screen bg-background">
+    <div className="min-h-screen bg-[radial-gradient(circle_at_bottom,_#000000_0%,_rgba(74,26,125,0.5)_0.1%,_#000000_70%)]">
       <Header />
       <ProgressNavigationBar
         isVisible={true}
@@ -510,7 +518,11 @@ const ModuleQuizInterface = () => {
                 </div>
               ) : error ? (
                 <div className="glass-card rounded-lg p-8 text-center border border-warning/20">
-                  <Icon name="AlertCircle" size={32} className="text-warning mx-auto mb-4" />
+                  <Icon
+                    name="AlertCircle"
+                    size={32}
+                    className="text-warning mx-auto mb-4"
+                  />
                   <p className="text-sm text-muted-foreground mb-4">{error}</p>
                   <Button
                     variant="outline"

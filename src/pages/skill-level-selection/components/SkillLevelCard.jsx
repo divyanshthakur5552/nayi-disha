@@ -2,7 +2,13 @@ import React from "react";
 import Icon from "../../../components/AppIcon";
 import Button from "../../../components/ui/Button";
 
-const SkillLevelCard = ({ level, isSelected, onSelect, technology = "JavaScript", className = "" }) => {
+const SkillLevelCard = ({
+  level,
+  isSelected,
+  onSelect,
+  technology = "JavaScript",
+  className = "",
+}) => {
   // Dynamic content based on technology
   const getLevelConfig = (tech) => {
     const configs = {
@@ -256,10 +262,10 @@ const SkillLevelCard = ({ level, isSelected, onSelect, technology = "JavaScript"
   };
 
   const techConfig = getLevelConfig(technology);
-  
+
   const levelConfig = {
     basic: {
-      icon: "Seedling",
+      icon: "Book",
       title: "Basic",
       subtitle: "Just Getting Started",
       description:
@@ -313,10 +319,10 @@ const SkillLevelCard = ({ level, isSelected, onSelect, technology = "JavaScript"
   return (
     <div
       className={`
-        relative glass-card transition-all duration-300 cursor-pointer group
+        relative bg-[#0a0a0a] border-[#171717] transition-all duration-300 cursor-pointer group
         ${
           isSelected
-            ? `border-2 ${config?.borderColor} neon-glow bg-gradient-to-br ${config?.gradient}`
+            ? `border-2 ${config?.borderColor} neon-glow bg-[#262626] `
             : "border border-purple-500/20 hover:border-purple-500/40"
         }
         hover:shadow-glass-lg animate-fade-in

@@ -4,7 +4,9 @@ import { Link } from "react-router-dom";
 
 const Logo = () => (
   <div className="flex items-center space-x-3">
-    <h3 className="cursor-pointer text-lg font-bold text-foreground">Nayi Disha</h3>
+    <h1 className="cursor-pointer text-3xl font-bold text-foreground">
+      Nayi <span className="text-primary">Disha</span>
+    </h1>
   </div>
 );
 
@@ -41,7 +43,11 @@ export default function Navbar() {
           <div className="relative flex flex-wrap items-center justify-between gap-6 py-3 lg:gap-0 lg:py-4">
             {/* Logo and mobile menu button */}
             <div className="flex w-full justify-between lg:w-auto">
-              <Link to="/" aria-label="home" className="flex items-center space-x-2">
+              <Link
+                to="/"
+                aria-label="home"
+                className="flex items-center space-x-2"
+              >
                 <Logo />
               </Link>
 

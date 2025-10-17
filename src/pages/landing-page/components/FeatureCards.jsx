@@ -58,7 +58,7 @@ const FeatureCards = () => {
   };
 
   return (
-    <section className="bg-gradient-to-b from-[#000] to-[#09090b]-500">
+    <section className="bg-gradient-to-b from-[#000] to-[#09090b]">
       <div className="max-w-6xl mx-auto ">
         {/* Section Header */}
         <motion.div
@@ -72,7 +72,8 @@ const FeatureCards = () => {
             Why Choose <span className="text-primary">Nayi Disha</span>?
           </h2>
           <p className="text-muted-foreground max-w-3xl mx-auto">
-            Experience personalized education with AI technology designed to accelerate your learning.
+            Experience personalized education with AI technology designed to
+            accelerate your learning.
           </p>
         </motion.div>
 
@@ -90,14 +91,14 @@ const FeatureCards = () => {
               variants={cardVariants}
               className="group"
             >
-              <div className="bg-card border bg-[radial-gradient(rgba(255,255,255,0.3)_1px, transparent_1px)] [background-size:16px_16px]   rounded-lg p-6 h-full hover:border-primary/50 transition-colors">
-                {/* Icon */} <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_center,transparent_40%,rgba(0,0,0,0.9)_100%)"></div>
+              <div className="bg-card border rounded-lg p-6 h-full hover:border-primary/50 transition-colors">
+                {/* Icon */}
                 <div className="mb-4 ">
                   <div className="w-12 h-12 rounded-lg bg-primary/10 flex items-center justify-center">
                     <Icon
                       name={feature?.icon}
                       size={24}
-                      className="text-primary shadow-[0px_4px_16px_rgba(17,17,26,0.1),_0px_8px_24px_rgba(17,17,26,0.1),_0px_16px_56px_rgba(17,17,26,0.1)]"
+                      className="text-primary "
                     />
                   </div>
                 </div>
@@ -114,7 +115,6 @@ const FeatureCards = () => {
             </motion.div>
           ))}
         </motion.div>
-
       </div>
     </section>
   );

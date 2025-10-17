@@ -375,12 +375,15 @@ const GoalSelection = () => {
 
   // Get goals for selected technology
   const technologyName = selectedSubject?.name || "JavaScript";
-  const goals = goalsByTechnology[technologyName] || goalsByTechnology.JavaScript;
+  const goals =
+    goalsByTechnology[technologyName] || goalsByTechnology.JavaScript;
 
   // Load saved data on component mount
   useEffect(() => {
     // Read technology from the correct localStorage key
-    const savedTechnology = localStorage.getItem("Nayi Disha_selected_technology");
+    const savedTechnology = localStorage.getItem(
+      "Nayi Disha_selected_technology"
+    );
     const savedGoal = localStorage.getItem("Nayi Disha_selected_goal");
 
     if (savedTechnology) {
@@ -406,10 +409,7 @@ const GoalSelection = () => {
 
     // Save to localStorage
     const goalData = goals?.find((g) => g?.id === goalId);
-    localStorage.setItem(
-      "Nayi Disha_selected_goal",
-      JSON.stringify(goalData)
-    );
+    localStorage.setItem("Nayi Disha_selected_goal", JSON.stringify(goalData));
 
     // Save onboarding progress
     const onboardingData = JSON.parse(
@@ -446,9 +446,7 @@ const GoalSelection = () => {
   return (
     <div className="min-h-screen bg-background">
       {/* Background Effects */}
-      <div className="fixed inset-0 gradient-bg opacity-30"></div>
-      <div className="fixed inset-0 bg-[radial-gradient(circle_at_30%_20%,rgba(139,92,246,0.1),transparent_50%)]"></div>
-      <div className="fixed inset-0 bg-[radial-gradient(circle_at_70%_80%,rgba(6,182,212,0.1),transparent_50%)]"></div>
+      <div className="fixed  bg-[linear-gradient(180deg,rgba(74,26,125,1)_20%,rgba(0,0,0,1)_100%)]"></div>
       {/* Content */}
       <div className="relative z-10">
         <div className="container mx-auto px-6 py-8">

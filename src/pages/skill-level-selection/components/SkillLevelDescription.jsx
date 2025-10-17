@@ -50,10 +50,10 @@ const SkillLevelDescription = ({ className = "" }) => {
 
   return (
     <div
-      className={`glass-card border border-purple-500/20 rounded-lg p-6 ${className}`}
+      className={`border-[#171717] bg-[#0a0a0a] rounded-xl border border-purple-500/20  p-6 ${className}`}
     >
       <div className="text-center mb-6">
-        <div className="w-16 h-16 mx-auto mb-4 rounded-full bg-gradient-to-br from-primary to-secondary flex items-center justify-center neon-glow">
+        <div className="w-16 h-16 mx-auto mb-4 rounded-full bg-[#171717] flex items-center justify-center neon-glow">
           <Icon name="Settings" size={32} className="text-white" />
         </div>
         <h2 className="text-2xl font-bold text-gradient mb-2">

@@ -43,23 +43,22 @@ const RoadmapHeader = ({
   ];
 
   return (
-    <div className="glass-card border border-purple-500/20 rounded-lg p-6 mb-8">
+    <div className="bg-[#0a0a0a] border shadow-[inset_0px_0px_30px_#000000] rounded-lg p-6 mb-8">
       {/* Header Section */}
       <div className="flex flex-col lg:flex-row lg:items-start lg:justify-between mb-6">
         <div className="flex-1 mb-6 lg:mb-0">
           <div className="flex items-center space-x-3 mb-3">
-
             <div>
-              <h1 className="text-2xl lg:text-3xl font-bold text-gradient">
+              <h1 className="text-2xl lg:text-3xl font-mono font-bold text-[#d4d4d4]">
                 {data?.title}
               </h1>
-              <p className="text-sm text-muted-foreground">
+              <p className="text-sm mt-4 text-[#262626]">
                 AI-Generated Learning Roadmap
               </p>
             </div>
           </div>
 
-          <p className="text-muted-foreground mb-4 max-w-2xl">
+          <p className="text-muted-foreground mb-4 max-w-2xl text-[#262626]">
             {data?.description}
           </p>
 
@@ -68,9 +67,11 @@ const RoadmapHeader = ({
             <div className="glass-surface border border-purple-500/10 rounded-lg p-3">
               <div className="flex items-center space-x-2 mb-1">
                 <Icon name="Layers" size={16} className="text-primary" />
-                <span className="text-xs text-muted-foreground">Modules</span>
+                <span className="text-xs text-muted-foreground text-[#d4d4d4]">
+                  Modules
+                </span>
               </div>
-              <div className="text-lg font-semibold text-foreground">
+              <div className="text-lg font-semibold text-foreground text-[#d4d4d4]">
                 {data?.totalModules}
               </div>
             </div>
@@ -80,7 +81,7 @@ const RoadmapHeader = ({
                 <Icon name="Clock" size={16} className="text-secondary" />
                 <span className="text-xs text-muted-foreground">Est. Time</span>
               </div>
-              <div className="text-lg font-semibold text-foreground">
+              <div className="text-lg font-semibold text-foreground text-[#d4d4d4]">
                 {data?.estimatedTime}
               </div>
             </div>
@@ -90,7 +91,7 @@ const RoadmapHeader = ({
                 <Icon name="BarChart3" size={16} className="text-warning" />
                 <span className="text-xs text-muted-foreground">Level</span>
               </div>
-              <div className="text-lg font-semibold text-foreground">
+              <div className="text-lg font-semibold text-foreground text-[#d4d4d4]">
                 {data?.difficulty}
               </div>
             </div>
@@ -100,7 +101,7 @@ const RoadmapHeader = ({
                 <Icon name="TrendingUp" size={16} className="text-success" />
                 <span className="text-xs text-muted-foreground">Progress</span>
               </div>
-              <div className="text-lg font-semibold text-foreground">
+              <div className="text-lg font-semibold text-foreground text-[#d4d4d4]">
                 {completionPercentage}%
               </div>
             </div>

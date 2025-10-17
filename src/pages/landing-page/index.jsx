@@ -7,6 +7,7 @@ import TechnologyShowcase from "./components/TechnologyShowcase";
 import SocialProofSection from "./components/SocialProofSection";
 import CallToActionSection from "./components/CallToActionSection";
 import Navbar from "./components/NavBar";
+
 const LandingPage = () => {
   const navigate = useNavigate();
 
@@ -15,14 +16,16 @@ const LandingPage = () => {
   };
 
   return (
-    <div className="bg-[radial-gradient(circle_at_top,_#000000_0%,_rgba(74,26,125,0.6)_30%,_#000000_70%)] text-foreground w-screen -z-10 top-0 h-screen bg-transparent">
+    <div className="  w-screen -z-10 top-0 h-screen bg-[radial-gradient(circle_at_top,_#000000_0%,_rgba(74,26,125,0.5)_0%,_#000000_70%)]">
       <Navbar />
       {/* Hero Section */}
       <HeroSection onStartLearning={handleStartLearning} />
+
       {/* Feature Cards Section */}
       <FeatureCards />
       {/* Technology Showcase */}
       <TechnologyShowcase />
+
       {/* Social Proof Section */}
       <SocialProofSection />
       {/* Call to Action Section */}

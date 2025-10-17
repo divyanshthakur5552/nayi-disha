@@ -86,7 +86,7 @@ const QuickActions = ({
   return (
     <div className={`space-y-6 ${className}`}>
       {/* Progress Summary */}
-      <div className="glass-card border border-purple-500/20 rounded-lg p-6">
+      <div className="bg-[#0a0a0a] border  rounded-lg p-6">
         <div className="flex items-center justify-between mb-4">
           <div>
             <h3 className="text-lg font-semibold text-foreground">
@@ -135,7 +135,7 @@ const QuickActions = ({
         </div>
       </div>
       {/* Quick Actions */}
-      <div className="glass-card border border-purple-500/20 rounded-lg p-6">
+      <div className="bg-[#0a0a0a] border border-purple-500/20 rounded-lg p-6">
         <h3 className="text-lg font-semibold text-foreground mb-4 flex items-center space-x-2">
           <Icon name="Zap" size={20} className="text-primary" />
           <span>Quick Actions</span>
@@ -166,7 +166,7 @@ const QuickActions = ({
         </div>
       </div>
       {/* Learning Tips */}
-      <div className="glass-card border border-purple-500/20 rounded-lg p-6">
+      <div className="bg-[#0a0a0a] border border-purple-500/20 rounded-lg p-6">
         <h3 className="text-lg font-semibold text-foreground mb-4 flex items-center space-x-2">
           <Icon name="Lightbulb" size={20} className="text-warning" />
           <span>Learning Tips</span>
@@ -212,7 +212,7 @@ const QuickActions = ({
       </div>
       {/* Achievement Badge */}
       {progressPercentage >= 30 && (
-        <div className="glass-card border border-success/20 rounded-lg p-6 bg-success/5">
+        <div className="bg-[#0a0a0a] border border-success/20 rounded-lg p-6 bg-success/5">
           <div className="flex items-center space-x-3">
             <div className="w-12 h-12 rounded-full bg-success/20 flex items-center justify-center">
               <Icon name="Award" size={24} className="text-success" />

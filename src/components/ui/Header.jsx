@@ -27,12 +27,6 @@ const Header = ({ className = "" }) => {
       icon: "TrendingUp",
       description: "Track your learning progress",
     },
-    {
-      label: "Goals",
-      path: "/goal-selection",
-      icon: "Target",
-      description: "Manage learning goals",
-    },
   ];
 
   const secondaryItems = [

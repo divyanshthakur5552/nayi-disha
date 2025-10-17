@@ -103,7 +103,7 @@ const OnboardingStepIndicator = ({
                         status === "completed"
                           ? "bg-success text-success-foreground neon-glow"
                           : status === "current"
-                          ? "bg-primary text-primary-foreground neon-glow animate-pulse"
+                          ? "bg-primary text-primary-foreground neon-glow "
                           : "bg-muted text-muted-foreground"
                       }
                     `}
@@ -129,8 +129,10 @@ const OnboardingStepIndicator = ({
                     >
                       {step?.title}
                     </div>
-                    <div className="text-xs text-muted-foreground mt-1">
-                      {step?.description}
+                    <div className=" tracking-tighter text-muted-foreground mt-1">
+                      <p className="text-xs w-auto whitespace-nowrap">
+                        {step?.description}
+                      </p>
                     </div>
                   </div>
                 </div>

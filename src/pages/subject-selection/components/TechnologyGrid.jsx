@@ -12,7 +12,7 @@ const TechnologyGrid = ({
       {/* Section Header */}
       <div className="text-center mb-8">
         <h2 className="text-2xl font-bold text-foreground mb-2">
-          Choose Your Technology Focus
+          Choose Your <span className="text-primary">Technology</span> Focus
         </h2>
         <p className="text-muted-foreground max-w-2xl mx-auto">
           Select the programming technology you want to master. This choice will

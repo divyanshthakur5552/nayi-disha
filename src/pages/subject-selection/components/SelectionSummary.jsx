@@ -32,7 +32,7 @@ const SelectionSummary = ({
 
   return (
     <div
-      className={`glass-card border border-primary/30 neon-glow animate-fade-in ${className}`}
+      className={` border border-primary/30 bg-[#171717] rounded-xl shadow-[0_2.8px_2.2px_rgba(0,_0,_0,_0.034),_0_6.7px_5.3px_rgba(0,_0,_0,_0.048),_0_12.5px_10px_rgba(0,_0,_0,_0.06),_0_22.3px_17.9px_rgba(0,_0,_0,_0.072),_0_41.8px_33.4px_rgba(0,_0,_0,_0.086),_0_100px_80px_rgba(0,_0,_0,_0.12)]  ${className}`}
     >
       <div className="p-6">
         {/* Header */}
@@ -44,14 +44,14 @@ const SelectionSummary = ({
             <h3 className="text-lg font-semibold text-foreground">
               Technology Selected
             </h3>
-            <p className="text-sm text-muted-foreground">
+            <p className="text-sm text-[#737373] ">
               Ready to proceed to goal selection
             </p>
           </div>
         </div>
 
         {/* Selected Technology Display */}
-        <div className="flex items-center space-x-4 mb-6 p-4 glass-surface rounded-lg border border-purple-500/10">
+        <div className="flex items-center space-x-4 mb-6 p-4 glass-surface rounded-lg border border-[text-[#0a0a0a]]">
           <div
             className={`
               w-12 h-12 rounded-lg bg-gradient-to-br ${getTechnologyColor(
@@ -88,7 +88,7 @@ const SelectionSummary = ({
             </div>
           </div>
           <div className="text-center">
-            <div className="text-2xl font-bold text-secondary mb-1">
+            <div className="text-2xl font-bold text-[#a3a3a3] mb-1">
               {selectedTechnology?.estimatedHours}h
             </div>
             <div className="text-xs text-muted-foreground">Estimated Time</div>

@@ -145,10 +145,10 @@ const ModuleCard = ({
     >
       {/* Timeline Node */}
       {viewMode === "timeline" && (
-        <div className="flex-shrink-0 relative z-10">
+        <div className="flex-shrink-0  relative z-10">
           <div
             className={`
-              w-12 h-12 rounded-full flex items-center justify-center border-4 border-background
+              w-12 h-12 rounded-full flex items-center bg-[#0a0a0a] justify-center border-4 border-background
               ${
                 moduleData?.status === "completed"
                   ? "bg-success neon-glow"

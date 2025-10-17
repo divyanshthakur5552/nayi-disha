@@ -69,18 +69,18 @@ const RoadmapGenerationModal = ({
     const processSteps = async () => {
       try {
         setError(null);
-        
+
         // Start visual progress animation
         for (let i = 0; i < 2; i++) {
           setCurrentStep(i);
           const stepDuration = generationSteps?.[i]?.duration;
-          
+
           const progressInterval = setInterval(() => {
             elapsed += 50;
             const newProgress = Math.min((elapsed / totalDuration) * 100, 40);
             setProgress(newProgress);
           }, 50);
-          
+
           await new Promise((resolve) => setTimeout(resolve, stepDuration));
           clearInterval(progressInterval);
         }
@@ -88,39 +88,40 @@ const RoadmapGenerationModal = ({
         // Make actual API call during "Consulting AI Engine" step
         setCurrentStep(1);
         setProgress(45);
-        
+
         const roadmapData = await generateRoadmap(
           userSelections?.subject || "JavaScript",
           userSelections?.goal || "Full Stack Development",
           userSelections?.skillLevel || "intermediate"
         );
-        
+
         setGeneratedRoadmap(roadmapData);
         setProgress(70);
-        
+
         // Continue with remaining visual steps
         for (let i = 2; i < generationSteps?.length; i++) {
           setCurrentStep(i);
           const stepDuration = 1000; // Faster since API is done
-          
+
           const progressInterval = setInterval(() => {
             setProgress((prev) => Math.min(prev + 5, 95));
           }, 100);
-          
+
           await new Promise((resolve) => setTimeout(resolve, stepDuration));
           clearInterval(progressInterval);
         }
-        
+
         // Complete
         setProgress(100);
         setTimeout(() => {
           setIsGenerating(false);
           onComplete(roadmapData);
         }, 500);
-        
       } catch (err) {
         console.error("Roadmap generation error:", err);
-        setError(err.message || "Failed to generate roadmap. Please try again.");
+        setError(
+          err.message || "Failed to generate roadmap. Please try again."
+        );
         setIsGenerating(false);
         setProgress(0);
       }
@@ -132,11 +133,11 @@ const RoadmapGenerationModal = ({
   if (!isOpen) return null;
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
+    <div className="fixed inset-0 z-50  flex items-center justify-center ">
       {/* Backdrop */}
       <div className="absolute inset-0 bg-black/60 backdrop-blur-sm"></div>
       {/* Modal */}
-      <div className="relative glass-card border border-purple-500/20 rounded-lg p-8 max-w-md w-full animate-fade-in">
+      <div className="relative backdrop-blur-xl border border-purple-500/20 rounded-lg p-8 max-w-md w-full animate-fade-in">
         <div className="text-center">
           {/* Header */}
           <div className="mb-6">
@@ -268,8 +269,14 @@ const RoadmapGenerationModal = ({
             {error ? (
               <>
                 <div className="mb-4 p-4 bg-destructive/10 border border-destructive/20 rounded-lg">
-                  <Icon name="AlertCircle" size={24} className="text-destructive mx-auto mb-2" />
-                  <p className="text-sm text-destructive font-medium mb-1">Generation Failed</p>
+                  <Icon
+                    name="AlertCircle"
+                    size={24}
+                    className="text-destructive mx-auto mb-2"
+                  />
+                  <p className="text-sm text-destructive font-medium mb-1">
+                    Generation Failed
+                  </p>
                   <p className="text-xs text-muted-foreground">{error}</p>
                 </div>
                 <div className="flex gap-2 justify-center">

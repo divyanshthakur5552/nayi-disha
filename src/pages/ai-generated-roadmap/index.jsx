@@ -21,55 +21,62 @@ const AIGeneratedRoadmap = () => {
 
   // Generate dynamic mock data based on user selections
   const getUserSelections = () => {
-    const savedTechnology = localStorage.getItem("Nayi Disha_selected_technology");
+    const savedTechnology = localStorage.getItem(
+      "Nayi Disha_selected_technology"
+    );
     const savedGoal = localStorage.getItem("Nayi Disha_selected_goal");
     const savedSelections = localStorage.getItem("Nayi Disha_selections");
-    
+
     let subject = "JavaScript";
     let goal = "Full Stack Development";
     let skillLevel = "intermediate";
-    
+
     if (savedTechnology) {
       try {
         const tech = JSON.parse(savedTechnology);
         subject = tech?.name || tech;
       } catch (e) {}
     }
-    
+
     if (savedGoal) {
       try {
         const goalData = JSON.parse(savedGoal);
         goal = goalData?.title || goalData;
       } catch (e) {}
     }
-    
+
     if (savedSelections) {
       try {
         const sel = JSON.parse(savedSelections);
         skillLevel = sel?.skillLevel || skillLevel;
       } catch (e) {}
     }
-    
+
     return { subject, goal, skillLevel };
   };
-  
+
   const selections = getUserSelections();
-  
+
   const mockRoadmapData = {
-    id: `roadmap_${selections.subject.toLowerCase()}_${selections.goal.toLowerCase().replace(/\s+/g, '_')}_${selections.skillLevel}`,
+    id: `roadmap_${selections.subject.toLowerCase()}_${selections.goal
+      .toLowerCase()
+      .replace(/\s+/g, "_")}_${selections.skillLevel}`,
     title: `${selections.subject} ${selections.goal} Learning Roadmap`,
-    description:
-      `A comprehensive learning path tailored to your ${selections.skillLevel} skill level, focusing on ${selections.subject} for ${selections.goal}. This roadmap adapts to your progress and provides personalized recommendations.`,
+    description: `A comprehensive learning path tailored to your ${selections.skillLevel} skill level, focusing on ${selections.subject} for ${selections.goal}. This roadmap adapts to your progress and provides personalized recommendations.`,
     totalModules: 10,
     estimatedTime: "32-42 hours",
-    difficulty: selections.skillLevel.charAt(0).toUpperCase() + selections.skillLevel.slice(1),
+    difficulty:
+      selections.skillLevel.charAt(0).toUpperCase() +
+      selections.skillLevel.slice(1),
     completedModules: 0,
     createdAt: new Date()?.toISOString(),
     lastUpdated: new Date()?.toISOString(),
     userSelections: {
       subject: selections.subject,
       goal: selections.goal,
-      skillLevel: selections.skillLevel.charAt(0).toUpperCase() + selections.skillLevel.slice(1),
+      skillLevel:
+        selections.skillLevel.charAt(0).toUpperCase() +
+        selections.skillLevel.slice(1),
     },
     aiRecommendations: [
       "Focus on practical projects to reinforce theoretical concepts",
@@ -83,11 +90,11 @@ const AIGeneratedRoadmap = () => {
   useEffect(() => {
     const loadRoadmap = async () => {
       setIsLoading(true);
-      
+
       try {
         // Check if we have fresh data from generation
         const stateRoadmap = location?.state?.roadmapData;
-        
+
         if (stateRoadmap) {
           // Use freshly generated roadmap
           const enhancedData = {
@@ -102,20 +109,23 @@ const AIGeneratedRoadmap = () => {
               skillLevel: location?.state?.skillLevel || "intermediate",
             },
           };
-          
+
           setRoadmapData(enhancedData);
-          localStorage.setItem("Nayi Disha_roadmap", JSON.stringify(enhancedData));
+          localStorage.setItem(
+            "Nayi Disha_roadmap",
+            JSON.stringify(enhancedData)
+          );
         } else {
           // Try to load from localStorage first
           const cached = localStorage.getItem("generatedRoadmap");
-          
+
           if (cached) {
             const cachedData = JSON.parse(cached);
             setRoadmapData(cachedData);
           } else {
             // Try to fetch from backend
             const backendData = await getRoadmap();
-            
+
             if (backendData) {
               setRoadmapData(backendData);
             } else {
@@ -137,7 +147,7 @@ const AIGeneratedRoadmap = () => {
         setIsLoading(false);
       }
     };
-    
+
     loadRoadmap();
   }, [location?.state]);
 
@@ -151,10 +161,7 @@ const AIGeneratedRoadmap = () => {
 
   const handleModuleStart = (module) => {
     // Save current module to localStorage
-    localStorage.setItem(
-      "Nayi Disha_current_module",
-      JSON.stringify(module)
-    );
+    localStorage.setItem("Nayi Disha_current_module", JSON.stringify(module));
 
     // Navigate to quiz interface
     navigate("/module-quiz-interface", {
@@ -238,15 +245,11 @@ const AIGeneratedRoadmap = () => {
   }
 
   return (
-    <div className="min-h-screen bg-background">
+    <div className="min-h-screen bg-black">
       <Header />
-      <ProgressNavigationBar
-        isVisible={true}
-        overallProgress={roadmapData?.overallProgress || 0}
-        totalModules={roadmapData?.totalModules || 0}
-      />
+
       <main className="pt-32 pb-16">
-        <div className="container mx-auto px-6">
+        <div className="container  mx-auto px-6">
           <div className="flex flex-col lg:flex-row gap-8">
             {/* Main Content */}
             <div className="flex-1">

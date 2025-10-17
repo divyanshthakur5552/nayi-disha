@@ -6,16 +6,15 @@ import { LayoutTextFlip } from "./LayoutText";
 
 const HeroSection = ({ onStartLearning }) => {
   return (
-    <section className="relative min-h-screen flex items-center justify-center ">
+    <section className="relative min-h-screen  flex items-center justify-center bg-transparent  ">
       {/* Radial Gradient Background */}
-      <div className="w-screen absolute -z-10 top-0 overflow-hidden h-screen"></div>
+      {/* <div className="w-screen absolute -z-10 top-0 overflow-hidden h-screen"></div> */}
       <div className="relative z-10 max-w-4xl mx-auto px-6 text-center">
         <motion.div
           initial={{ opacity: 0, y: 30 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.8, ease: "easeOut" }}
         >
-
           {/* Main Headline */}
           <motion.div
             className="mb-6"
@@ -34,7 +33,6 @@ const HeroSection = ({ onStartLearning }) => {
               duration={3000}
             />
           </motion.div>
-
           {/* Value Proposition */}
           <motion.p
             className="text-lg text-muted-foreground mb-12 max-w-2xl mx-auto leading-relaxed"
@@ -46,8 +44,6 @@ const HeroSection = ({ onStartLearning }) => {
             roadmaps, adaptive quizzes, and comprehensive progress tracking.
           </motion.p>
 
-
-          {/* CTA Button */}
           <motion.div
             className="mb-12"
             initial={{ opacity: 0, y: 20 }}
@@ -62,10 +58,9 @@ const HeroSection = ({ onStartLearning }) => {
               iconPosition="right"
               iconSize={18}
             >
-              <p className="text-sm text-center drop-shadow-md ">Start Learning</p>
+              <p className="text-sm text-center  ">Start Learning</p>
             </Button>
           </motion.div>
-
           {/* Trust Indicators */}
           <motion.div
             className="flex flex-wrap justify-center items-center gap-8 text-sm text-muted-foreground"
