@@ -173,8 +173,11 @@ const ModuleQuizInterface = () => {
         throw new Error("No question data received");
       }
 
-      if (!questionData.options || !Array.isArray(questionData.options)) {
-        console.error("Invalid options:", questionData.options);
+      // Handle nested question object structure
+      const questionInfo = questionData.question || questionData;
+      
+      if (!questionInfo.options || !Array.isArray(questionInfo.options)) {
+        console.error("Invalid options:", questionInfo.options);
         throw new Error(
           "Invalid question data structure - options missing or not an array"
         );
@@ -182,19 +185,19 @@ const ModuleQuizInterface = () => {
 
       // Transform backend response to match component format
       const formattedQuestion = {
-        id: questionData.id || `q-${Date.now()}`,
+        id: questionInfo.id || questionData.id || `q-${Date.now()}`,
         number: questions.length + 1,
-        text: questionData.question || "Question text missing",
-        topic: questionData.topic || "General",
-        difficulty: questionData.difficulty || "medium",
-        options: questionData.options.map((opt, idx) => ({
+        text: questionInfo.question || "Question text missing",
+        topic: questionInfo.topic || "General",
+        difficulty: questionInfo.difficulty || questionData.currentDifficulty || "medium",
+        options: questionInfo.options.map((opt, idx) => ({
           id: String.fromCharCode(97 + idx), // a, b, c, d
           label: String.fromCharCode(65 + idx), // A, B, C, D
           text: opt,
         })),
-        explanation: questionData.explanation || "No explanation provided",
+        explanation: questionInfo.explanation || "No explanation provided",
         correctAnswer: String.fromCharCode(
-          97 + (questionData.correctIndex || 0)
+          97 + (questionInfo.correctIndex || 0)
         ),
       };
 

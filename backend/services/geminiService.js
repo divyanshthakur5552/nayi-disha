@@ -14,6 +14,71 @@ class GeminiService {
   }
 
   /**
+   * Extract and clean JSON from Gemini response
+   * Handles markdown code blocks, nested code snippets, and malformed JSON
+   * @param {string} response - Raw response from Gemini
+   * @returns {string} Cleaned JSON string ready for parsing
+   */
+  extractJSON(response) {
+    let jsonText = response.trim();
+    
+    // Try to extract JSON from markdown code blocks
+    // Match: ```json ... ```, ```javascript ... ```, or ``` ... ```
+    const codeBlockMatch = jsonText.match(/```(?:json|javascript)?\s*([\s\S]*?)```/);
+    if (codeBlockMatch) {
+      jsonText = codeBlockMatch[1].trim();
+    }
+    
+    // Find the actual JSON object boundaries
+    const jsonStart = jsonText.indexOf('{');
+    const jsonEnd = jsonText.lastIndexOf('}');
+    
+    if (jsonStart === -1 || jsonEnd === -1) {
+      throw new Error('No valid JSON object found in response');
+    }
+    
+    jsonText = jsonText.substring(jsonStart, jsonEnd + 1);
+    
+    // Handle common JSON issues when code snippets are embedded
+    // Replace unescaped newlines in strings (common when code is embedded)
+    try {
+      // First attempt: try parsing as-is
+      JSON.parse(jsonText);
+      return jsonText;
+    } catch (error) {
+      // If parsing fails, try to fix common issues
+      console.log('⚠️  Initial parse failed, attempting to fix JSON...');
+      
+      // Strategy: re-parse with more aggressive cleaning
+      // Replace literal newlines within string values with escaped newlines
+      // This is a simplified approach - for production, consider using a proper JSON repair library
+      
+      try {
+        // Attempt to use regex to fix unescaped newlines in strings
+        // This regex finds string values and escapes newlines within them
+        const fixedJson = jsonText.replace(
+          /"([^"]*(?:\\.[^"]*)*)"/g,
+          (match, content) => {
+            // Escape unescaped newlines and tabs
+            const fixed = content
+              .replace(/(?<!\\)\n/g, '\\n')
+              .replace(/(?<!\\)\r/g, '\\r')
+              .replace(/(?<!\\)\t/g, '\\t');
+            return `"${fixed}"`;
+          }
+        );
+        
+        JSON.parse(fixedJson);
+        console.log('✅ JSON successfully repaired');
+        return fixedJson;
+      } catch (fixError) {
+        console.error('Failed to repair JSON:', fixError.message);
+        throw error; // Throw original error
+      }
+    }
+  }
+
+  /**
    * Generate a personalized learning roadmap
    * @param {string} subject - Learning subject (JavaScript, React, Python, Node.js)
    * @param {string} goal - Learning goal (Web Dev, DSA, Full-Stack, etc.)
@@ -55,30 +120,29 @@ Return ONLY valid JSON in this exact format:
   }
 }`;
 
+    let response;
     try {
       const result = await this.model.generateContent(prompt);
-      const response = result.response.text();
+      response = result.response.text();
       
       console.log('\n📋 Gemini Roadmap Response:');
       console.log('─'.repeat(80));
       console.log(response.substring(0, 500) + (response.length > 500 ? '...' : ''));
       console.log('─'.repeat(80));
       
-      // Extract JSON from markdown code blocks if present
-      // Match: ```json ... ```, ```javascript ... ```, or ``` ... ```
-      let jsonText = response;
-      const codeBlockMatch = response.match(/```(?:json|javascript)?\s*([\s\S]*?)```/);
-      if (codeBlockMatch) {
-        jsonText = codeBlockMatch[1];
-      }
+      // Extract and clean JSON from response
+      const jsonText = this.extractJSON(response);
       
-      const parsedData = JSON.parse(jsonText.trim());
+      const parsedData = JSON.parse(jsonText);
       
       console.log('\n✅ Successfully parsed roadmap with', parsedData.roadmap?.modules?.length || 0, 'modules\n');
       
       return parsedData;
     } catch (error) {
       console.error('\n❌ Error generating roadmap:', error.message);
+      if (response) {
+        console.error('Response that failed to parse:', response.substring(0, 500));
+      }
       throw new Error('Failed to generate roadmap from AI');
     }
   }
@@ -90,7 +154,8 @@ Return ONLY valid JSON in this exact format:
    * @param {string} difficulty - Question difficulty (easy, medium, hard)
    * @returns {Promise<object>} Quiz question with options and explanation
    */
-  async generateQuestion(moduleTitle, topics, difficulty) {
+  async generateQuestion(moduleTitle, topics, difficulty, retryCount = 0) {
+    const maxRetries = 2;
     const difficultyGuidance = {
       easy: 'Basic understanding, recall, and simple application',
       medium: 'Practical application, problem-solving, and concept integration',
@@ -113,30 +178,35 @@ Generate a single quiz question in this EXACT JSON format:
   "topic": "specific topic from the list"
 }
 
-Requirements:
+IMPORTANT Requirements:
 - Question should be practical and scenario-based when possible
 - All 4 options should be plausible
 - Explanation should be educational and comprehensive
-- Return ONLY valid JSON, no markdown formatting`;
+- If you need to include code in the question, options, or explanation, escape all special characters properly
+- All strings must be valid JSON strings (escape quotes, newlines, and backslashes)
+- Return ONLY valid JSON, no markdown formatting or code blocks
+- DO NOT include code snippets with triple backticks inside the JSON`;
 
+    let response;
     try {
       const result = await this.model.generateContent(prompt);
-      const response = result.response.text();
+      response = result.response.text();
       
       console.log('\n❓ Gemini Question Response:');
       console.log('─'.repeat(80));
       console.log(response.substring(0, 300) + (response.length > 300 ? '...' : ''));
       console.log('─'.repeat(80));
       
-      // Extract JSON from markdown code blocks if present
-      // Match: ```json ... ```, ```javascript ... ```, or ``` ... ```
-      let jsonText = response;
-      const codeBlockMatch = response.match(/```(?:json|javascript)?\s*([\s\S]*?)```/);
-      if (codeBlockMatch) {
-        jsonText = codeBlockMatch[1];
-      }
+      // Extract and clean JSON from response
+      const jsonText = this.extractJSON(response);
       
-      const questionData = JSON.parse(jsonText.trim());
+      const questionData = JSON.parse(jsonText);
+      
+      // Validate required fields
+      if (!questionData.question || !Array.isArray(questionData.options) || 
+          questionData.correctIndex === undefined || !questionData.explanation) {
+        throw new Error('Invalid question format: missing required fields');
+      }
       
       // Add unique ID
       questionData.id = `q-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`;
@@ -145,8 +215,17 @@ Requirements:
       
       return questionData;
     } catch (error) {
-      console.error('\n❌ Error generating question:', error.message);
-      throw new Error('Failed to generate question from AI');
+      console.error(`\n❌ Error generating question (attempt ${retryCount + 1}/${maxRetries + 1}):`, error.message);
+      
+      // Retry with a simpler prompt if we haven't exceeded max retries
+      if (retryCount < maxRetries) {
+        console.log(`🔄 Retrying question generation...\n`);
+        await new Promise(resolve => setTimeout(resolve, 1000)); // Wait 1 second before retry
+        return this.generateQuestion(moduleTitle, topics, difficulty, retryCount + 1);
+      }
+      
+      console.error('Response that failed to parse:', response?.substring(0, 500));
+      throw new Error('Failed to generate question from AI after multiple attempts');
     }
   }
 
@@ -188,30 +267,29 @@ Generate a JSON report with:
 
 Provide honest, constructive feedback. Return ONLY valid JSON.`;
 
+    let response;
     try {
       const result = await this.model.generateContent(prompt);
-      const response = result.response.text();
+      response = result.response.text();
       
       console.log('\n📊 Gemini Report Response:');
       console.log('─'.repeat(80));
       console.log(response.substring(0, 400) + (response.length > 400 ? '...' : ''));
       console.log('─'.repeat(80));
       
-      // Extract JSON from markdown code blocks if present
-      // Match: ```json ... ```, ```javascript ... ```, or ``` ... ```
-      let jsonText = response;
-      const codeBlockMatch = response.match(/```(?:json|javascript)?\s*([\s\S]*?)```/);
-      if (codeBlockMatch) {
-        jsonText = codeBlockMatch[1];
-      }
+      // Extract and clean JSON from response
+      const jsonText = this.extractJSON(response);
       
-      const reportData = JSON.parse(jsonText.trim());
+      const reportData = JSON.parse(jsonText);
       
       console.log('\n✅ Generated report with score:', reportData.overallScore || 'N/A', '\n');
       
       return reportData;
     } catch (error) {
       console.error('\n❌ Error generating report:', error.message);
+      if (response) {
+        console.error('Response that failed to parse:', response.substring(0, 500));
+      }
       throw new Error('Failed to generate completion report');
     }
   }
